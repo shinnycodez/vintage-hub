@@ -45,8 +45,9 @@ function App() {
     );
   }
 
-  return (
-    <Router>
+return (
+  <Router>
+    {!loading ? (
       <Routes>
         {/* Public route */}
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
@@ -54,18 +55,20 @@ function App() {
         {/* Protected routes */}
         <Route path="/" element={user ? <Home /> : <Navigate to="/login" replace />} />
         <Route path="/checkout" element={user ? <CheckoutPage /> : <Navigate to="/login" replace />} />
-         <Route path="/buynowcheckout" element={user ? <BuyNowCheckout/> : <Navigate to="/login" replace />} />   
+        <Route path="/buynowcheckout" element={user ? <BuyNowCheckout /> : <Navigate to="/login" replace />} />
         <Route path="/products" element={user ? <Products /> : <Navigate to="/login" replace />} />
         <Route path="/admin" element={user ? <AdminPortal /> : <Navigate to="/login" replace />} />
-        
-        {/* ✅ Dynamic product route */}
         <Route path="/product/:id" element={user ? <ProductPage /> : <Navigate to="/login" replace />} />
 
         {/* Fallback route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Router>
-  );
+    ) : (
+      <LoadingSpinner />
+    )}
+  </Router>
+);
+
 }
 
 export default App;
