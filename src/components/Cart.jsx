@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { collection, query, where, onSnapshot, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { Link } from 'react-router-dom';
-
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const Cart = ({ isOpen, onClose }) => {
   const [cartItems, setCartItems] = useState([]);
-  const userEmail = localStorage.getItem('email');
+  const [user, loading] = useAuthState(auth);
 
   useEffect(() => {
-    if (!userEmail || !isOpen) return;
+    if (loading || !user || !isOpen) return;
 
-    const q = query(collection(db, 'carts'), where('user', '==', userEmail));
+    const q = query(collection(db, 'carts'), where('user', '==', user.email));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -22,7 +22,7 @@ const Cart = ({ isOpen, onClose }) => {
     });
 
     return () => unsubscribe();
-  }, [userEmail, isOpen]);
+  }, [user, loading, isOpen]);
 
   const removeItem = async (id) => {
     try {
@@ -41,7 +41,10 @@ const Cart = ({ isOpen, onClose }) => {
     }
   };
 
-  const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const total = cartItems.reduce(
+    (acc, item) => acc + (item.price || 0) * (item.quantity || 1),
+    0
+  );
 
   return (
     <div
@@ -57,7 +60,9 @@ const Cart = ({ isOpen, onClose }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {cartItems.length === 0 ? (
+          {loading ? (
+            <p className="text-gray-500">Loading cart...</p>
+          ) : cartItems.length === 0 ? (
             <p className="text-gray-500">Your cart is currently empty.</p>
           ) : (
             cartItems.map((item) => (
@@ -102,23 +107,22 @@ const Cart = ({ isOpen, onClose }) => {
               Rs. {total.toLocaleString()}
             </span>
           </div>
-{cartItems.length > 0 ? (
-  <Link
-    to="/checkout"
-    onClick={onClose}
-    className="block w-full text-center bg-[#141414] text-white py-2 rounded-lg hover:opacity-90 transition"
-  >
-    Proceed to Checkout
-  </Link>
-) : (
-  <button
-    disabled
-    className="w-full bg-[#141414] text-white py-2 rounded-lg opacity-50 cursor-not-allowed"
-  >
-    Proceed to Checkout
-  </button>
-)}
-
+          {cartItems.length > 0 ? (
+            <Link
+              to="/checkout"
+              onClick={onClose}
+              className="block w-full text-center bg-[#141414] text-white py-2 rounded-lg hover:opacity-90 transition"
+            >
+              Proceed to Checkout
+            </Link>
+          ) : (
+            <button
+              disabled
+              className="w-full bg-[#141414] text-white py-2 rounded-lg opacity-50 cursor-not-allowed"
+            >
+              Proceed to Checkout
+            </button>
+          )}
         </div>
       </div>
     </div>
