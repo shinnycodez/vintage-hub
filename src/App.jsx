@@ -31,9 +31,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  if (loading) return <LoadingSpinner />;
 
   if (error) {
     return (
@@ -45,30 +43,28 @@ function App() {
     );
   }
 
-return (
-  <Router>
-    {!loading ? (
+  return (
+    <Router>
       <Routes>
-        {/* Public route */}
+        {/* Public Routes */}
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/product/:id" element={<ProductPage />} />
+        <Route path="/buynowcheckout" element={<BuyNowCheckout />} />
+        <Route path="/admin" element={<AdminPortal />} />
 
-        {/* Protected routes */}
-        <Route path="/" element={user ? <Home /> : <Navigate to="/login" replace />} />
-        <Route path="/checkout" element={user ? <CheckoutPage /> : <Navigate to="/login" replace />} />
-        <Route path="/buynowcheckout" element={user ? <BuyNowCheckout /> : <Navigate to="/login" replace />} />
-        <Route path="/products" element={user ? <Products /> : <Navigate to="/login" replace />} />
-        <Route path="/admin" element={user ? <AdminPortal /> : <Navigate to="/login" replace />} />
-        <Route path="/product/:id" element={user ? <ProductPage /> : <Navigate to="/login" replace />} />
+        {/* Protected Route */}
+        <Route
+          path="/checkout"
+          element={user ? <CheckoutPage /> : <Navigate to="/login" replace />}
+        />
 
-        {/* Fallback route */}
+        {/* Fallback Route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    ) : (
-      <LoadingSpinner />
-    )}
-  </Router>
-);
-
+    </Router>
+  );
 }
 
 export default App;

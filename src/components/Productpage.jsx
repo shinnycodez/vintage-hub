@@ -55,12 +55,12 @@ const ProductPage = ({ onOpenCart }) => {
   }, [id]);
 
   const handleAddToCart = async () => {
-    if (loading) return;
+  if (loading) return;
 
-    if (!user) {
-      alert('Please log in to add items to your cart.');
-      return;
-    }
+  if (!user) {
+    navigate('/login');
+    return;
+  }
 
     const userEmail = user.email;
 
@@ -106,13 +106,12 @@ const ProductPage = ({ onOpenCart }) => {
   };
 
   const handleBuyNow = () => {
-    if (loading) return;
+  if (loading) return;
 
-    if (!user) {
-      alert('Please log in to proceed.');
-      return;
-    }
-
+  if (!user) {
+    navigate('/login');
+    return;
+  }
     navigate('/buynowcheckout', {
       state: {
         product: {

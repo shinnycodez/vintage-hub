@@ -90,7 +90,13 @@ const Header = () => {
                 />
               </>
             ) : (
-              <Link to="/login" className="px-4 h-10 rounded-lg bg-[#141414] text-white text-sm font-semibold hover:opacity-90 transition">Login</Link>
+        <Link
+  to="/login"
+  className="flex items-center justify-center px-4 h-10 rounded-lg bg-[#141414] text-white text-sm font-semibold hover:opacity-90 transition"
+>
+  Login
+</Link>
+
             )}
           </div>
 

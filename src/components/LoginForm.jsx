@@ -105,7 +105,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 ">
       <div className="w-full max-w-md mx-auto">
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-gray-800 to-black shadow-lg transform -skew-y-3 sm:skew-y-0 sm:-rotate-3 rounded-2xl sm:rounded-3xl"></div>
