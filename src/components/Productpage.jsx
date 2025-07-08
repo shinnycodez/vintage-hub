@@ -10,7 +10,8 @@ import {
   updateDoc,
   setDoc
 } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 import Header from './Header';
 import ProductImageGrid from './ProductImageGrid';
@@ -29,6 +30,8 @@ const ProductPage = ({ onOpenCart }) => {
   const [hasLining, setHasLining] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const [user, loading] = useAuthState(auth);
 
   const typeOptions = ['UNSTITCHED', 'STITCHED'];
   const sizes = ['Small', 'Medium', 'Large', 'XL', 'XXL'];
@@ -52,11 +55,14 @@ const ProductPage = ({ onOpenCart }) => {
   }, [id]);
 
   const handleAddToCart = async () => {
-    const userEmail = localStorage.getItem('email');
-    if (!userEmail) {
+    if (loading) return;
+
+    if (!user) {
       alert('Please log in to add items to your cart.');
       return;
     }
+
+    const userEmail = user.email;
 
     try {
       const q = query(
@@ -100,8 +106,9 @@ const ProductPage = ({ onOpenCart }) => {
   };
 
   const handleBuyNow = () => {
-    const userEmail = localStorage.getItem('email');
-    if (!userEmail) {
+    if (loading) return;
+
+    if (!user) {
       alert('Please log in to proceed.');
       return;
     }

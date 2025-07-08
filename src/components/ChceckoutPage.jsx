@@ -3,9 +3,10 @@ import { doc, collection, query, where, onSnapshot, deleteDoc, addDoc } from 'fi
 import { auth, db } from '../firebase';
 import Header from './Header';
 import { useNavigate } from 'react-router-dom';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const CheckoutPage = () => {
-  const user = auth.currentUser;
+  const [user, loadingAuth] = useAuthState(auth);
   const userEmail = user?.email;
   const navigate = useNavigate();
 
@@ -27,15 +28,23 @@ const CheckoutPage = () => {
     promoCode: '',
     notes: '',
   });
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Update email in form once user is available
+  useEffect(() => {
+    if (userEmail) {
+      setForm((prev) => ({ ...prev, email: userEmail }));
+    }
+  }, [userEmail]);
 
   // Load cart items
   useEffect(() => {
     if (!userEmail) return;
     const q = query(collection(db, 'carts'), where('user', '==', userEmail));
     const unsub = onSnapshot(q, (snapshot) => {
-      setCartItems(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+      setCartItems(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
     return unsub;
   }, [userEmail]);
@@ -46,21 +55,21 @@ const CheckoutPage = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-    // Clear error when field is edited
+
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
     const requiredFields = ['fullName', 'phone', 'address', 'city', 'postalCode', 'country'];
-    
-    requiredFields.forEach(field => {
+
+    requiredFields.forEach((field) => {
       if (!form[field]) {
         newErrors[field] = 'This field is required';
       }
@@ -87,7 +96,7 @@ const CheckoutPage = () => {
 
     const order = {
       user: userEmail,
-      items: cartItems.map(item => ({
+      items: cartItems.map((item) => ({
         productId: item.productId,
         title: item.title,
         type: item.type,
@@ -119,7 +128,7 @@ const CheckoutPage = () => {
 
     try {
       await addDoc(collection(db, 'orders'), order);
-      await Promise.all(cartItems.map(item => deleteDoc(doc(db, 'carts', item.id))));
+      await Promise.all(cartItems.map((item) => deleteDoc(doc(db, 'carts', item.id))));
       navigate('/order-confirmation');
     } catch (err) {
       console.error(err);
@@ -128,6 +137,33 @@ const CheckoutPage = () => {
       setLoading(false);
     }
   };
+
+  // Wait for auth to load
+  if (loadingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show login prompt
+  if (!userEmail) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold mb-4">Please Login to Checkout</h2>
+          <p className="mb-6 text-gray-600">You need to be logged in to complete your purchase.</p>
+          <button
+            onClick={() => navigate('/login')}
+            className="w-full bg-black text-white py-3 rounded-md font-medium hover:bg-gray-800 transition"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!userEmail) {
     return (
