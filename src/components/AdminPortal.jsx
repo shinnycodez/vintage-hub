@@ -207,6 +207,19 @@ function AdminPortal() {
     <div className="mt-4 space-y-2 text-sm text-gray-700">
       <p><strong>Status:</strong> {order.status}</p>
       <p><strong>Payment Method:</strong> {order.payment}</p>
+      {order.payment === 'Bank Transfer' && order.bankTransferProofBase64 && (
+        <div className="mt-2">
+          <strong>Bank Transfer Proof:</strong>
+          <div className="mt-1 border border-gray-300 p-2 rounded max-w-xs">
+            {/* Display the Base64 image directly */}
+            <img 
+              src={order.bankTransferProofBase64} 
+              alt="Bank Transfer Proof" 
+              className="w-full h-auto object-contain" 
+            />
+          </div>
+        </div>
+      )}
       <p><strong>Shipping Method:</strong> {order.shipping}</p>
       <p><strong>Promo Code:</strong> {order.promoCode || "None"}</p>
       <p><strong>Notes:</strong> {order.notes || "None"}</p>
@@ -218,6 +231,7 @@ function AdminPortal() {
       <div>
         <strong>Shipping Address:</strong>
         <div className="ml-4">
+          <p>{order.shippingAddress?.fullName}</p>
           <p>{order.shippingAddress?.address}</p>
           <p>{order.shippingAddress?.city}, {order.shippingAddress?.region}</p>
           <p>{order.shippingAddress?.country}, {order.shippingAddress?.postalCode}</p>

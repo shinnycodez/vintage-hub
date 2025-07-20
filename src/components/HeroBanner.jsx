@@ -49,7 +49,8 @@ function HeroBanner() {
     <div className="@container relative">
       <div className="@[480px]:p-4">
         <div
-          className="flex min-h-[320px] md:min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-lg items-center justify-center p-4 transition-all duration-500 ease-in-out"
+          // MODIFIED LINE: Changed min-h-[320px] to min-h-[240px]
+          className="flex min-h-[240px] md:min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-lg items-center justify-center p-4 transition-all duration-500 ease-in-out"
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4)), url("${currentSlideData.imageUrl}")`,
           }}
