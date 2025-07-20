@@ -110,7 +110,7 @@ const LoginForm = () => {
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-gray-800 to-black shadow-lg transform -skew-y-3 sm:skew-y-0 sm:-rotate-3 rounded-2xl sm:rounded-3xl"></div>
 
-          <div className="relative bg-white shadow-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10">
+          <div className="relative bg-[#FFF2EB] shadow-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10">
             <div className="text-center mb-6">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
                 {isSignUp ? 'Create Account' : 'Login'}
@@ -239,7 +239,7 @@ const LoginForm = () => {
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">
+                  <span className="px-2 bg-[#FFF2EB] text-gray-500">
                     {isSignUp ? 'Or sign up with' : 'Or continue with'}
                   </span>
                 </div>
