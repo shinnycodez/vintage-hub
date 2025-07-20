@@ -100,7 +100,7 @@ function ProductGrid({ filters = {} }) {
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <Link to={`/product/${product.id}`} key={product.id}>
-              <div className="flex flex-col gap-3 pb-3 group shadow-md rounded-lg overflow-hidden transition-transform duration-300 hover:shadow-lg bg-white">
+              <div className="flex flex-col gap-3 pb-3 group shadow-md rounded-lg overflow-hidden transition-transform duration-300 hover:shadow-lg bg-[#FFF2EB]"> {/* Changed background color here */}
                 {/* Product image */}
                 <div className="w-full aspect-[3/4] overflow-hidden">
                   <img

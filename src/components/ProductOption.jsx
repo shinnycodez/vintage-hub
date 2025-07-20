@@ -8,11 +8,11 @@ const ProductOption = ({ options, name, title, selected, onSelect }) => {
         {options.map((option) => (
           <label
             key={option}
-            className={`text-sm font-medium leading-normal flex items-center justify-center rounded-xl border px-4 h-11 text-[#141414] relative cursor-pointer
+            className={`text-sm font-medium leading-normal flex items-center justify-center rounded-xl border px-4 h-11 text-[#141414] relative cursor-pointer bg-[#FFF2EB] // Added background color here
               ${
                 selected === option
                   ? 'border-[3px] border-black px-3.5'
-                  : 'border-[#e0e0e0]'
+                  : 'border-[#e0e0e0]' // Reverted border to ensure visibility against FFF2EB background
               }`}
           >
             {option}

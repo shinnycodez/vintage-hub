@@ -55,12 +55,12 @@ const ProductPage = ({ onOpenCart }) => {
   }, [id]);
 
   const handleAddToCart = async () => {
-  if (loading) return;
+    if (loading) return;
 
-  if (!user) {
-    navigate('/login');
-    return;
-  }
+    if (!user) {
+      navigate('/login');
+      return;
+    }
 
     const userEmail = user.email;
 
@@ -106,12 +106,12 @@ const ProductPage = ({ onOpenCart }) => {
   };
 
   const handleBuyNow = () => {
-  if (loading) return;
+    if (loading) return;
 
-  if (!user) {
-    navigate('/login');
-    return;
-  }
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     navigate('/buynowcheckout', {
       state: {
         product: {
@@ -133,7 +133,7 @@ const ProductPage = ({ onOpenCart }) => {
     : [product.coverImage];
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-white overflow-x-hidden">
+    <div className="relative flex min-h-screen flex-col bg-[#FFDCDC] overflow-x-hidden">
       {showSuccess && (
         <div className="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100]">
           <div className="flex items-center gap-3 bg-green-100 border border-green-300 text-green-800 px-5 py-2 rounded-xl shadow-lg animate-fade-in-out transition-all">
@@ -155,7 +155,7 @@ const ProductPage = ({ onOpenCart }) => {
       <div className="layout-container flex h-full grow flex-col">
         <div className="gap-1 px-6 flex flex-1 justify-center py-5 flex-col md:flex-row">
           <div className="flex flex-col max-w-[920px] flex-1">
-            <div className="flex w-full grow bg-white p-4">
+            <div className="flex w-full grow p-4"> {/* This div's background remains white to differentiate the image section */}
               <ProductImageGrid images={allImages} />
             </div>
           </div>
@@ -182,12 +182,12 @@ const ProductPage = ({ onOpenCart }) => {
               onSelect={setSelectedSize}
             />
 
-            <CheckboxOption
+            {/* <CheckboxOption
               label="LINING"
               price="PKR 2500"
               checked={hasLining}
               onChange={setHasLining}
-            />
+            /> */}
 
             <QuantitySelector
               quantity={quantity}

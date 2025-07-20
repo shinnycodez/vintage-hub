@@ -4,10 +4,10 @@ const ProductImageGrid = ({ images }) => {
   const [mainImage, setMainImage] = useState(images[0]);
 
   return (
-    <div className="w-full bg-white rounded-xl">
+    <div className="w-full bg-[#FFDCDC] rounded-xl">
       {/* Main Image - Responsive display */}
-      <div 
-        className="w-full bg-center bg-no-repeat bg-contain bg-white rounded-t-xl mb-4 flex justify-center items-center"
+      <div
+        className="w-full bg-center bg-no-repeat bg-contain bg-[#FFDCDC] rounded-t-xl mb-4 flex justify-center items-center"
         style={{ backgroundImage: `url("${mainImage}")` }}
       >
         <div className="aspect-video w-full max-h-[600px] h-[50vh] sm:h-[70vh] md:h-[500px]"></div>
@@ -27,7 +27,7 @@ const ProductImageGrid = ({ images }) => {
               <img
                 src={image}
                 alt={`Thumbnail ${index + 1}`}
-                className="w-full h-full object-contain bg-white"
+                className="w-full h-full object-contain bg-[#FFDCDC]" // Changed thumbnail background to FFDCDC
               />
             </div>
           ))}

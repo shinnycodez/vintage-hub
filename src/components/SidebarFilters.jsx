@@ -45,7 +45,7 @@ function SidebarFilters({ onFilterChange }) {
         {Object.keys(options).map((filter) => (
           <details
             key={filter}
-            className="flex flex-col rounded-lg border border-[#e0e0e0] bg-white px-[15px] py-[7px] group"
+            className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#FFF2EB] px-[15px] py-[7px] group" // Changed background here
           >
             <summary className="flex cursor-pointer items-center justify-between gap-6 py-2">
               <p className="text-[#141414] text-sm font-medium leading-normal">{filter}</p>
@@ -82,7 +82,7 @@ function SidebarFilters({ onFilterChange }) {
         {/* Price Range */}
         <details
           open
-          className="flex flex-col rounded-lg border border-[#e0e0e0] bg-white px-[15px] py-[7px] group"
+          className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#FFF2EB] px-[15px] py-[7px] group" // Changed background here
         >
           <summary className="flex cursor-pointer items-center justify-between gap-6 py-2">
             <p className="text-[#141414] text-sm font-medium leading-normal">Price Range</p>
@@ -99,7 +99,7 @@ function SidebarFilters({ onFilterChange }) {
                 min={0}
                 value={tempFilters.priceRange[0]}
                 onChange={(e) => handlePriceChange(0, e.target.value)}
-                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm"
+                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#FFF2EB]" // Changed input background
               />
               <span className="text-sm text-[#757575]">to</span>
               <input
@@ -107,7 +107,7 @@ function SidebarFilters({ onFilterChange }) {
                 min={tempFilters.priceRange[0]}
                 value={tempFilters.priceRange[1]}
                 onChange={(e) => handlePriceChange(1, e.target.value)}
-                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm"
+                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#FFF2EB]" // Changed input background
               />
             </div>
           </div>

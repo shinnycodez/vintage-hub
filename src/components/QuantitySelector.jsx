@@ -23,7 +23,7 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
       <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
         Quantity
       </h3>
-      <div className="flex items-center gap-4 bg-white px-4 min-h-14 justify-between">
+      <div className="flex items-center gap-4 bg-[#FFF2EB] px-4 min-h-14 justify-between rounded-xl"> {/* Added rounded-xl here */}
         <p className="text-[#141414] text-base font-normal leading-normal flex-1 truncate">
           Quantity:
         </p>
@@ -31,7 +31,7 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
           <div className="flex items-center gap-2 text-[#141414]">
             <button
               onClick={handleDecrement}
-              className="text-base font-medium leading-normal flex h-7 w-7 items-center justify-center rounded-full bg-[#f2f2f2] cursor-pointer"
+              className="text-base font-medium leading-normal flex h-7 w-7 items-center justify-center rounded-full bg-[#FFE9DD] cursor-pointer"
             >
               −
             </button>
@@ -44,7 +44,7 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
             />
             <button
               onClick={handleIncrement}
-              className="text-base font-medium leading-normal flex h-7 w-7 items-center justify-center rounded-full bg-[#f2f2f2] cursor-pointer"
+              className="text-base font-medium leading-normal flex h-7 w-7 items-center justify-center rounded-full bg-[#FFE9DD] cursor-pointer"
             >
               +
             </button>

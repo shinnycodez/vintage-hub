@@ -9,7 +9,7 @@ const SizeSelector = ({ sizes, selectedSize, onSelect }) => {
           <select
             value={selectedSize}
             onChange={(e) => onSelect(e.target.value)}
-            className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border border-[#e0e0e0] bg-white focus:border-[#e0e0e0] h-14 placeholder:text-[#757575] p-[15px] text-base font-normal leading-normal"
+            className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border border-[#e0e0e0] bg-[#FFF2EB] focus:border-[#e0e0e0] h-14 placeholder:text-[#757575] p-[15px] text-base font-normal leading-normal"
           >
             <option value="">Select Size</option>
             {sizes.map((size) => (

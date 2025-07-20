@@ -31,7 +31,7 @@ function Products() {
 
   return (
     <div
-      className="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden"
+      className="relative flex size-full min-h-screen flex-col bg-[#FFDCDC] group/design-root overflow-x-hidden" // Changed background color to FFDCDC
       style={{ fontFamily: '"Noto Serif", "Noto Sans", sans-serif' }}
     >
       <div className="layout-container flex h-full grow flex-col">
