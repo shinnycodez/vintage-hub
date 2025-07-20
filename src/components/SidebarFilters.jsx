@@ -8,7 +8,7 @@ function SidebarFilters({ onFilterChange }) {
   });
 
   const options = {
-    Category: ['Suits', 'Old Money', 'Baggy'],
+    Category: ['Phone charm', 'Arm cuff', 'Bracelet'],
     Availability: [true, false], // Boolean values
   };
 

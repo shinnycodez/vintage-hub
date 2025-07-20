@@ -47,9 +47,9 @@ const Header = () => {
 
           <div className="hidden md:flex items-center gap-5 lg:gap-9">
             <Link to="/" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Home</Link>
-            <Link to="/products?category=Suits" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Suits</Link>
-            <Link to="/products?category=Old Money" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Old Money</Link>
-            <Link to="/products?category=Baggy" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Baggy</Link>
+            <Link to="/products?category=Phone charm" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Phone charm</Link>
+            <Link to="/products?category=Arm cuff" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Arm cuff</Link>
+            <Link to="/products?category=Bracelet" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Bracelet</Link>
             {user?.email === "mueezimran1@gmail.com" && (
               <Link to="/admin" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Admin</Link>
             )}
@@ -139,9 +139,9 @@ const Header = () => {
               </div>
 
               {/* Mobile Nav */}
-              <Link to="/products?category=Suits" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Suits</Link>
-              <Link to="/products?category=Old Money" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Old Money</Link>
-              <Link to="/products?category=Baggy" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Baggy</Link>
+              <Link to="/products?category=Phone charm" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Phone charm</Link>
+              <Link to="/products?category=Arm cuff" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Arm cuff</Link>
+              <Link to="/products?category=Bracelet" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Bracelet</Link>
 
               {user?.email === "mueezimran1@gmail.com" && (
                 <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Admin</Link>

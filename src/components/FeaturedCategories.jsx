@@ -10,7 +10,7 @@ const categories = [
     {
     id: 3,
     title: "Arm cuff",
-    imageUrl: "https://scontent.flhe7-2.fna.fbcdn.net/v/t1.15752-9/521351027_1761814377757115_402458874944723219_n.png?stp=dst-png_s526x395&_nc_cat=109&ccb=1-7&_nc_sid=0024fc&_nc_ohc=l6pwqajH-HkQ7kNvwEjeuKX&_nc_oc=Adni7S2t6Zg0ZCsKESxylgKZykaWrGPAYY4SA1K8djjOij3A03LMhUjf08glPyGe_JI&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe7-2.fna&oh=03_Q7cD2wGJsTydVSyLiZ7YrRtHpW-Tw3FDb-a5Q5sGU7-B4EBcTA&oe=68A48600"
+    imageUrl: "https://scontent.flhe7-2.fna.fbcdn.net/v/t1.15752-9/518872764_2112236285933772_3598642941186150970_n.jpg?stp=dst-jpg_s640x640_tt6&_nc_cat=109&ccb=1-7&_nc_sid=0024fc&_nc_ohc=zw5gAhXJyb0Q7kNvwFuIW-U&_nc_oc=AdkPMfheZp8eN1CmI169itorL0wsq9qVdF3V9Zv4XQOfY5u8It4VKMFSiCDeh9zo6C0&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe7-2.fna&oh=03_Q7cD2wH84NMdygljraS0kAusoEbroghPVl9Wwv9b6B-ete1tmw&oe=68A46713"
   },
   {
     id: 2,

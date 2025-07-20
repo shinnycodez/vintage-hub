@@ -21,8 +21,8 @@ const BuyNowCheckout = () => {
     postalCode: '',
     region: '',
     country: '',
-    shippingMethod: 'Standard Delivery',
-    paymentMethod: 'Cash on Delivery',
+    shippingMethod: 'Standard Delivery', // Only Standard Delivery now
+    paymentMethod: 'Cash on Delivery', // Default to Cash on Delivery
     cardNumber: '',
     expiry: '',
     cvv: '',
@@ -45,7 +45,7 @@ const BuyNowCheckout = () => {
   }, [product]);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-  const shippingCost = form.shippingMethod === 'Express' ? 500 : 0;
+  const shippingCost = 300; // Standard Delivery is now PKR 300
   const total = subtotal + shippingCost;
 
   const handleChange = (e) => {
@@ -70,11 +70,12 @@ const BuyNowCheckout = () => {
       }
     });
 
-    if (form.paymentMethod === 'Card Payment') {
-      if (!form.cardNumber) newErrors.cardNumber = 'Required';
-      if (!form.expiry) newErrors.expiry = 'Required';
-      if (!form.cvv) newErrors.cvv = 'Required';
-    }
+    // Card payment validation removed as option is no longer available
+    // if (form.paymentMethod === 'Card Payment') {
+    //   if (!form.cardNumber) newErrors.cardNumber = 'Required';
+    //   if (!form.expiry) newErrors.expiry = 'Required';
+    //   if (!form.cvv) newErrors.cvv = 'Required';
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -298,30 +299,30 @@ const BuyNowCheckout = () => {
               <h2 className="text-xl font-semibold mt-8 mb-6 pb-2 border-b">Shipping Method</h2>
               
               <div className="space-y-4">
-                {['Standard Delivery', 'Express'].map(method => (
-                  <label key={method} className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
-                    <input
-                      type="radio"
-                      name="shippingMethod"
-                      value={method}
-                      checked={form.shippingMethod === method}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-black focus:ring-black border-gray-300"
-                    />
-                    <div className="ml-3">
-                      <p className="font-medium text-gray-900">{method}</p>
-                      <p className="text-sm text-gray-500">
-                        {method === 'Express' ? 'PKR 500 - Delivery in 2-3 business days' : 'Free - Delivery in 5-7 business days'}
-                      </p>
-                    </div>
-                  </label>
-                ))}
+                {/* Only Standard Delivery option now */}
+                <label className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
+                  <input
+                    type="radio"
+                    name="shippingMethod"
+                    value="Standard Delivery"
+                    checked={form.shippingMethod === 'Standard Delivery'}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-black focus:ring-black border-gray-300"
+                  />
+                  <div className="ml-3">
+                    <p className="font-medium text-gray-900">Standard Delivery</p>
+                    <p className="text-sm text-gray-500">
+                      PKR 300 - Delivery in 5-7 business days
+                    </p>
+                  </div>
+                </label>
               </div>
 
               <h2 className="text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
               
               <div className="space-y-4">
-                {['Cash on Delivery', 'Card Payment', 'Bank Transfer'].map(method => (
+                {/* Removed 'Card Payment' */}
+                {['Cash on Delivery', 'Bank Transfer'].map(method => (
                   <label key={method} className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
                     <input
                       type="radio"
@@ -336,7 +337,8 @@ const BuyNowCheckout = () => {
                 ))}
               </div>
 
-              {form.paymentMethod === 'Card Payment' && (
+              {/* Card Payment fields removed */}
+              {/* {form.paymentMethod === 'Card Payment' && (
                 <div className="mt-6 space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Card Number*</label>
@@ -376,7 +378,7 @@ const BuyNowCheckout = () => {
                     </div>
                   </div>
                 </div>
-              )}
+              )} */}
 
               <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Promo Code</label>
@@ -444,7 +446,7 @@ const BuyNowCheckout = () => {
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Shipping</span>
                   <span className="text-sm">
-                    {form.shippingMethod === 'Express' ? 'PKR 500' : 'Free'}
+                    PKR {shippingCost.toLocaleString()}
                   </span>
                 </div>
                 
