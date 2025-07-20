@@ -41,10 +41,10 @@ const Header = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-5 lg:gap-9">
-            <Link to="/" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Home</Link>
-            <Link to="/products?category=Phone charm" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Phone charm</Link>
-            <Link to="/products?category=Arm cuff" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Arm cuff</Link>
-            <Link to="/products?category=Bracelet" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Bracelet</Link>
+            <Link to="/" className="text-[#141414] text-sm font-medium transition">Home</Link>
+            <Link to="/products?category=Phone charm" className="text-[#141414] text-sm font-medium transition">Phone charm</Link>
+            <Link to="/products?category=Arm cuff" className="text-[#141414] text-sm font-medium  transition">Arm cuff</Link>
+            <Link to="/products?category=Bracelet" className="text-[#141414] text-sm font-medium  transition">Bracelet</Link>
             {user?.email === "mueezimran1@gmail.com" && (
               <Link to="/admin" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Admin</Link>
             )}
