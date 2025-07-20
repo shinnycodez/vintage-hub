@@ -23,7 +23,7 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
       <h3 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
         Quantity
       </h3>
-      <div className="flex items-center gap-4 bg-[#FFF2EB] px-4 min-h-14 justify-between rounded-xl"> {/* Added rounded-xl here */}
+      <div className="flex items-center gap- bg-[#FFF2EB] px-4 min-h-14 justify-between rounded-xl"> {/* Added rounded-xl here */}
         <p className="text-[#141414] text-base font-normal leading-normal flex-1 truncate">
           Quantity:
         </p>

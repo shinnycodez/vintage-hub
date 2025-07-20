@@ -168,19 +168,19 @@ const ProductPage = ({ onOpenCart }) => {
               packageInfo={product.packageInfo || '3 PIECE'}
             />
 
-            <ProductOption
+            {/* <ProductOption
               options={typeOptions}
               name="product-type"
               title="Type"
               selected={selectedType}
               onSelect={setSelectedType}
-            />
-
+            /> */}
+{/* 
             <SizeSelector
               sizes={sizes}
               selectedSize={selectedSize}
               onSelect={setSelectedSize}
-            />
+            /> */}
 
             {/* <CheckboxOption
               label="LINING"

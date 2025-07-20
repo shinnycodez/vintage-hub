@@ -348,8 +348,6 @@ const BuyNowCheckout = () => {
                     >
                       <option value="">Select Country</option>
                       <option value="PK">Pakistan</option>
-                      <option value="US">United States</option>
-                      <option value="UK">United Kingdom</option>
                       {/* Add more countries as needed */}
                     </select>
                     {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country}</p>}

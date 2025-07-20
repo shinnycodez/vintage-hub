@@ -138,7 +138,7 @@ const Header = () => {
               <Link to="/products?category=Arm cuff" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Arm cuff</Link>
               <Link to="/products?category=Bracelet" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Bracelet</Link>
 
-              {user?.email === "mueezimran1@gmail.com" && (
+              {user?.email === "mueezimran1@gmail.com" || "eclipsebyms@gmail.com" && (
                 <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Admin</Link>
               )}
 
