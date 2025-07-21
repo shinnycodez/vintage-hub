@@ -32,6 +32,8 @@ const Header = () => {
     }
   };
 
+  const adminEmails = ["mueezimran1@gmail.com", "eclipsebyms@gmail.com"];
+
   return (
     <>
       <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] bg-[#FFF2EB] px-4 md:px-10 py-3 relative">
@@ -45,14 +47,13 @@ const Header = () => {
             <Link to="/products?category=Phone charm" className="text-[#141414] text-sm font-medium transition">Phone charm</Link>
             <Link to="/products?category=Arm cuff" className="text-[#141414] text-sm font-medium  transition">Arm cuff</Link>
             <Link to="/products?category=Bracelet" className="text-[#141414] text-sm font-medium  transition">Bracelet</Link>
-            {user?.email === "mueezimran1@gmail.com" && (
+            {adminEmails.includes(user?.email) && (
               <Link to="/admin" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Admin</Link>
             )}
           </div>
         </div>
 
         <div className="flex flex-1 justify-end gap-4 md:gap-8">
-          {/* Desktop Search */}
           <label className="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
             <div className="flex w-full flex-1 items-stretch rounded-lg h-full">
               <div className="text-neutral-500 flex border-none bg-[#FFE9DD] items-center justify-center pl-4 rounded-l-lg border-r-0">
@@ -70,7 +71,6 @@ const Header = () => {
             </div>
           </label>
 
-          {/* Desktop Cart/Auth */}
           <div className="hidden md:flex gap-2 items-center">
             <button onClick={() => setIsCartOpen(true)} className="flex items-center justify-center px-4 h-10 rounded-lg bg-[#FFE9DD] text-[#141414] hover:bg-[#FFDCDC] transition">🛒 Cart</button>
             {user ? (
@@ -94,7 +94,6 @@ const Header = () => {
             )}
           </div>
 
-          {/* Mobile Icons */}
           <div className="md:hidden flex items-center gap-2">
             <button onClick={() => setIsCartOpen(true)} className="h-10 w-10 rounded-lg bg-[#FFE9DD]">🛒</button>
             <button onClick={toggleMenu} className="h-10 w-10 rounded-lg bg-[#FFE9DD]">
@@ -111,11 +110,9 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg z-50 border-t border-[#ededed]">
             <div className="px-4 py-2 space-y-2">
-              {/* Mobile Search */}
               <div className="flex items-center gap-2 rounded-lg bg-[#FFE9DD] px-3 py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#666" viewBox="0 0 256 256">
                   <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" />
@@ -133,12 +130,11 @@ const Header = () => {
                 </button>
               </div>
 
-              {/* Mobile Nav */}
               <Link to="/products?category=Phone charm" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Phone charm</Link>
               <Link to="/products?category=Arm cuff" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Arm cuff</Link>
               <Link to="/products?category=Bracelet" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Bracelet</Link>
 
-              {user?.email === "mueezimran1@gmail.com" || "eclipsebyms@gmail.com" && (
+              {adminEmails.includes(user?.email) && (
                 <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Admin</Link>
               )}
 
