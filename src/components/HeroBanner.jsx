@@ -7,22 +7,22 @@ function HeroBanner() {
       id: 1,
       imageUrl:
         'https://scontent.flhe3-1.fna.fbcdn.net/v/t1.15752-9/518477205_597348533178382_1085206324374393956_n.jpg?stp=dst-jpg_s640x640_tt6&_nc_cat=108&ccb=1-7&_nc_sid=0024fc&_nc_ohc=Pb7hVYa8aPsQ7kNvwF2EDa4&_nc_oc=Adl5WiaX6kaj905nP5PdU7idDODWDAHJ--hOlwXUalIl2VuyGQvjOlNlkTc749QufOQ&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe3-1.fna&oh=03_Q7cD2wG5CO-bTx7RYMkrlurEF9Xo7wrcSMSwnqlDaePxrBlYZA&oe=68A48A55',
-      title: 'Discover the New Collection',
-      subtitle: 'Explore the latest styles and trends in high fashion.',
+      title: 'Carry a little magic everywhere',
+      subtitle: '',
     },
     {
       id: 2,
       imageUrl:
         'https://scontent.flhe3-1.fna.fbcdn.net/v/t1.15752-9/520250629_1078276907743783_5894156676471813187_n.jpg?stp=dst-jpg_s640x640_tt6&_nc_cat=111&ccb=1-7&_nc_sid=0024fc&_nc_ohc=NeLMPC4k-jUQ7kNvwEd-iB9&_nc_oc=Adk5FFWnLZMvrKNWkADI-A_WeVtPKVrBKFkpQnRDbJDrV68EP4CZ41MbdpSgnVIffP0&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe3-1.fna&oh=03_Q7cD2wEhJnnhs98dRTyUe0PPIzmdnT1oGHSAULz7mscgMKTroQ&oe=68A48BFC',
-      title: 'Unveiling Our Latest Designs',
-      subtitle: 'Experience elegance and comfort with our new arrivals.',
+      title: 'Carry a little magic everywhere',
+      subtitle: '',
     },
     {
       id: 3,
       imageUrl:
         'https://scontent.flhe7-1.fna.fbcdn.net/v/t1.15752-9/518981308_4116077575347762_429374228166904827_n.jpg?stp=dst-jpg_s640x640_tt6&_nc_cat=104&ccb=1-7&_nc_sid=0024fc&_nc_ohc=Ef_DgRWa9tUQ7kNvwEjp_0P&_nc_oc=AdkxyNOtXMfllh9CPH1lIYh9CNWf8e1oyh4ht3bmopoU1al04ksJqYN7Ol8HENXam7k&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe7-1.fna&oh=03_Q7cD2wFJlZn7oKo3KWt8Uu21xTXHtqtA0Mkh9ItHuJSWUBBbDA&oe=68A47E9C',
-      title: 'Timeless Fashion, Modern Appeal',
-      subtitle: 'Find your perfect ensemble for every occasion.',
+      title: 'Carry a little magic everywhere',
+      subtitle: '',
     },
   ];
 

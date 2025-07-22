@@ -370,10 +370,10 @@ const CheckoutPage = () => {
                     Please transfer the total amount of PKR {total.toLocaleString()} to our bank account:
                   </p>
                   <ul className="list-disc list-inside text-gray-800 text-sm sm:text-base mb-4"> {/* Adjusted font size */}
-                    <li><strong>Bank Name:</strong> [Your Bank Name]</li>
-                    <li><strong>Account Name:</strong> [Your Account Holder Name]</li>
-                    <li><strong>Account Number:</strong> [Your Account Number]</li>
-                    <li><strong>IBAN:</strong> [Your IBAN]</li>
+                    <li><strong>Bank Name:</strong> [HBL]</li>
+                    <li><strong>Account Name:</strong> [Maham Sarwar]</li>
+                    <li><strong>Account Number:</strong> [02947902132799]</li>
+                    {/* <li><strong>IBAN:</strong> [Your IBAN]</li> */}
                   </ul>
                   <p className="text-gray-700 text-sm sm:text-base mb-4"> {/* Adjusted font size */}
                     After making the transfer, please upload a screenshot of the transaction as proof of payment.
