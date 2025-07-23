@@ -167,6 +167,11 @@ const ProductPage = ({ onOpenCart }) => {
               description={product.description}
               packageInfo={product.packageInfo || '3 PIECE'}
             />
+{product.available ? (
+  <p className="text-green-600 font-medium px-4">In Stock</p>
+) : (
+  <p className="text-red-600 font-medium px-4">Out of Stock</p>
+)}
 
             {/* <ProductOption
               options={typeOptions}
@@ -193,22 +198,32 @@ const ProductPage = ({ onOpenCart }) => {
               quantity={quantity}
               setQuantity={setQuantity}
             />
+<div className="flex flex-col gap-3 p-4">
+  <button
+    onClick={handleAddToCart}
+    className={`w-full border-2 py-3 px-4 rounded-xl font-medium text-base transition-colors ${
+      product.available
+        ? 'border-black text-black hover:bg-gray-100'
+        : 'border-gray-400 text-gray-400 cursor-not-allowed'
+    }`}
+    disabled={!product.available}
+  >
+    Add to Cart
+  </button>
 
-            <div className="flex flex-col gap-3 p-4">
-              <button
-                onClick={handleAddToCart}
-                className="w-full border-2 border-black text-black py-3 px-4 rounded-xl font-medium text-base hover:bg-gray-100 transition-colors"
-              >
-                Add to Cart
-              </button>
+  <button
+    onClick={handleBuyNow}
+    className={`w-full py-3 px-4 rounded-xl font-medium text-base transition-colors ${
+      product.available
+        ? 'bg-black text-white hover:bg-gray-800'
+        : 'bg-gray-400 text-white cursor-not-allowed'
+    }`}
+    disabled={!product.available}
+  >
+    Buy Now
+  </button>
+</div>
 
-              <button
-                onClick={handleBuyNow}
-                className="w-full bg-black text-white py-3 px-4 rounded-xl font-medium text-base hover:bg-gray-800 transition-colors"
-              >
-                Buy Now
-              </button>
-            </div>
           </div>
         </div>
       </div>
