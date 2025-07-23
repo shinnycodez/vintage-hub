@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 
-function SidebarFilters({ onFilterChange }) {
+function SidebarFilters({ onFilterChange, onClose }) {
   const [tempFilters, setTempFilters] = useState({
     category: [],
-    available: [], // ✅ still using 'available'
-    priceRange: [0, 500],
+    available: [],
+    priceRange: [0, 500000000],
   });
 
   const options = {
-    Category: ['Phone charm', 'Arm cuff', 'Bracelet' , 'Bookmarks' , 'Bag charms', 'Necklaces'],
-    Availability: [true, false], // Boolean values
+    Category: ['Phone charm', 'Arm cuff', 'Bracelet', 'Bookmarks', 'Bag charms', 'Necklaces'],
+    Availability: [true, false],
   };
 
   const handleCheckboxChange = (filterName, value) => {
@@ -34,10 +34,22 @@ function SidebarFilters({ onFilterChange }) {
 
   const applyFilters = () => {
     onFilterChange?.(tempFilters);
+    onClose?.(); // Close filter panel on mobile
+  };
+
+  const clearFilters = () => {
+    const cleared = {
+      category: [],
+      available: [],
+      priceRange: [0, 5000000],
+    };
+    setTempFilters(cleared);
+    onFilterChange?.(cleared);
+    onClose?.(); // Close filter panel on mobile
   };
 
   return (
-    <div className="hidden md:flex flex-col w-80">
+    <div className="flex flex-col w-full md:w-80">
       <h2 className="text-[#141414] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
         Filters
       </h2>
@@ -45,7 +57,7 @@ function SidebarFilters({ onFilterChange }) {
         {Object.keys(options).map((filter) => (
           <details
             key={filter}
-            className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#FFF2EB] px-[15px] py-[7px] group" // Changed background here
+            className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#FFF2EB] px-[15px] py-[7px] group"
           >
             <summary className="flex cursor-pointer items-center justify-between gap-6 py-2">
               <p className="text-[#141414] text-sm font-medium leading-normal">{filter}</p>
@@ -82,7 +94,7 @@ function SidebarFilters({ onFilterChange }) {
         {/* Price Range */}
         <details
           open
-          className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#FFF2EB] px-[15px] py-[7px] group" // Changed background here
+          className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#FFF2EB] px-[15px] py-[7px] group"
         >
           <summary className="flex cursor-pointer items-center justify-between gap-6 py-2">
             <p className="text-[#141414] text-sm font-medium leading-normal">Price Range</p>
@@ -99,7 +111,7 @@ function SidebarFilters({ onFilterChange }) {
                 min={0}
                 value={tempFilters.priceRange[0]}
                 onChange={(e) => handlePriceChange(0, e.target.value)}
-                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#FFF2EB]" // Changed input background
+                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#FFF2EB]"
               />
               <span className="text-sm text-[#757575]">to</span>
               <input
@@ -107,19 +119,27 @@ function SidebarFilters({ onFilterChange }) {
                 min={tempFilters.priceRange[0]}
                 value={tempFilters.priceRange[1]}
                 onChange={(e) => handlePriceChange(1, e.target.value)}
-                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#FFF2EB]" // Changed input background
+                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#FFF2EB]"
               />
             </div>
           </div>
         </details>
 
-        {/* Apply Button */}
-        <button
-          onClick={applyFilters}
-          className="mt-2 bg-[#141414] text-white text-sm font-semibold py-2 px-4 rounded hover:opacity-90 transition"
-        >
-          Apply Filters
-        </button>
+        {/* Action Buttons */}
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={applyFilters}
+            className="flex-1 bg-[#141414] text-white text-sm font-semibold py-2 px-4 rounded hover:opacity-90 transition"
+          >
+            Apply Filters
+          </button>
+          <button
+            onClick={clearFilters}
+            className="flex-1 border border-[#141414] text-[#141414] text-sm font-semibold py-2 px-4 rounded hover:bg-[#f3f3f3] transition"
+          >
+            Clear
+          </button>
+        </div>
       </div>
     </div>
   );
