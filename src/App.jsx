@@ -53,12 +53,10 @@ function App() {
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/buynowcheckout" element={<BuyNowCheckout />} />
         <Route path="/admin" element={<AdminPortal />} />
+       <Route path="/checkout" element={<CheckoutPage />} />
 
         {/* Protected Route */}
-        <Route
-          path="/checkout"
-          element={user ? <CheckoutPage /> : <Navigate to="/login" replace />}
-        />
+        
 
         {/* Fallback Route */}
         <Route path="*" element={<Navigate to="/" replace />} />

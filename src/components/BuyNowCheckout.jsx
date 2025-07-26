@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { doc, collection, query, where, onSnapshot, deleteDoc, addDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import Header from './Header';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const BuyNowCheckout = () => {
-  const user = auth.currentUser;
-  const userEmail = user?.email;
   const navigate = useNavigate();
-  const location = useLocation();
-  const product = location.state?.product;
-
+  const [product, setProduct] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [form, setForm] = useState({
-    email: userEmail || '',
+    email: '',
     fullName: '',
     phone: '',
     address: '',
@@ -22,7 +18,7 @@ const BuyNowCheckout = () => {
     region: '',
     country: '',
     shippingMethod: 'Standard Delivery',
-    paymentMethod: 'Cash on Delivery',
+    paymentMethod: 'Bank Transfer',
     promoCode: '',
     notes: '',
   });
@@ -31,20 +27,27 @@ const BuyNowCheckout = () => {
   const [bankTransferProofBase64, setBankTransferProofBase64] = useState(null);
   const [convertingImage, setConvertingImage] = useState(false);
 
-  // Initialize with the buy now product
+  // Load buy now product from session storage
   useEffect(() => {
-    if (product) {
-      setCartItems([{
-        id: `temp_${Date.now()}`,
-        ...product,
-        quantity: product.quantity || 1,
-        createdAt: new Date()
-      }]);
+    try {
+      const buyNowItem = sessionStorage.getItem('buyNowItem');
+      if (buyNowItem) {
+        const parsedProduct = JSON.parse(buyNowItem);
+        setProduct(parsedProduct);
+        setCartItems([{
+          id: parsedProduct.id || `temp_${Date.now()}`,
+          ...parsedProduct,
+          quantity: parsedProduct.quantity || 1,
+          createdAt: new Date()
+        }]);
+      }
+    } catch (error) {
+      console.error('Error loading buy now product:', error);
     }
-  }, [product]);
+  }, []);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-  const shippingCost = 300; // Fixed shipping cost
+  const shippingCost = 300;
   const total = subtotal + shippingCost;
 
   const handleChange = (e) => {
@@ -53,22 +56,24 @@ const BuyNowCheckout = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    
     // Clear error for the field being changed
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+    
     // Clear the Base64 string if payment method changes from Bank Transfer
     if (name === 'paymentMethod' && value !== 'Bank Transfer') {
       setBankTransferProofBase64(null);
-      setErrors(prev => ({ ...prev, bankTransferProof: '' })); // Clear bank transfer proof error
+      setErrors(prev => ({ ...prev, bankTransferProof: '' }));
     }
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Basic file size validation (e.g., 5MB limit)
-      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+      // Basic file size validation (5MB limit)
+      const MAX_FILE_SIZE = 5 * 1024 * 1024;
       if (file.size > MAX_FILE_SIZE) {
         setErrors(prev => ({ ...prev, bankTransferProof: 'File size exceeds 5MB limit.' }));
         setBankTransferProofBase64(null);
@@ -76,7 +81,7 @@ const BuyNowCheckout = () => {
       }
 
       setConvertingImage(true);
-      setErrors(prev => ({ ...prev, bankTransferProof: '' })); // Clear previous error
+      setErrors(prev => ({ ...prev, bankTransferProof: '' }));
 
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -92,13 +97,13 @@ const BuyNowCheckout = () => {
       reader.readAsDataURL(file);
     } else {
       setBankTransferProofBase64(null);
-      setErrors(prev => ({ ...prev, bankTransferProof: '' })); // Clear error if no file selected
+      setErrors(prev => ({ ...prev, bankTransferProof: '' }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    const requiredFields = ['fullName', 'phone', 'address', 'city', 'postalCode', 'country', 'region']; // Added region to required fields
+    const requiredFields = ['email', 'fullName', 'phone', 'address', 'city', 'postalCode', 'region', 'country'];
     
     requiredFields.forEach(field => {
       if (!form[field]) {
@@ -106,9 +111,14 @@ const BuyNowCheckout = () => {
       }
     });
 
-    // Basic phone number validation (e.g., at least 7 digits)
-    if (form.phone && !/^\d{7,}$/.test(form.phone)) {
-      newErrors.phone = 'Please enter a valid phone number.';
+    // Email validation
+    if (form.email && !/\S+@\S+\.\S+/.test(form.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Basic phone number validation
+    if (form.phone && !/^\d{7,}$/.test(form.phone.replace(/[\s\-\(\)]/g, ''))) {
+      newErrors.phone = 'Please enter a valid phone number (at least 7 digits)';
     }
 
     if (form.paymentMethod === 'Bank Transfer' && !bankTransferProofBase64) {
@@ -121,25 +131,29 @@ const BuyNowCheckout = () => {
 
   const placeOrder = async () => {
     if (!validateForm()) {
-      // Scroll to the first error if validation fails
+      // Scroll to the first error field
       const firstErrorField = Object.keys(errors)[0];
       if (firstErrorField) {
-        document.getElementsByName(firstErrorField)[0]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const element = document.getElementsByName(firstErrorField)[0] || 
+                      document.getElementById(firstErrorField);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       }
-      return;
-    }
-    
-    if (!userEmail) {
-      alert('Please login to complete your order');
       return;
     }
 
     setLoading(true);
 
+    // Generate unique order ID
+    const orderId = 'BUYNOW_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
     const order = {
-      user: userEmail,
+      orderId,
+      customerType: 'guest',
+      customerEmail: form.email,
       items: cartItems.map(item => ({
-        productId: item.productId || item.id.replace('temp_', ''), // Handle temp id for buy now
+        productId: item.productId || item.id.replace('temp_', ''),
         title: item.title,
         type: item.type,
         size: item.size,
@@ -165,18 +179,25 @@ const BuyNowCheckout = () => {
       shippingCost,
       total,
       createdAt: new Date(),
-      status: 'pending', // Initial status for new orders
+      status: 'processing',
       buyNow: true,
-      // Store the Base64 string directly in the Firestore document
       bankTransferProofBase64: form.paymentMethod === 'Bank Transfer' ? bankTransferProofBase64 : null,
     };
 
     try {
       await addDoc(collection(db, 'orders'), order);
-      navigate('/order-confirmation', { state: { order } }); // Pass order details to confirmation page
+      
+      // Clear the buy now item from storage
+      sessionStorage.removeItem('buyNowItem');
+      
+      // Store order details for confirmation page
+      sessionStorage.setItem('lastOrderId', orderId);
+      sessionStorage.setItem('lastOrderEmail', form.email);
+      sessionStorage.setItem('lastOrderType', 'buyNow');
+      
+      navigate('/order-confirmation');
     } catch (err) {
       console.error("Error placing order:", err);
-      // More specific error message for size limit (Firebase document size limit is ~1MB)
       if (err.code === 'resource-exhausted' || (err.message && err.message.includes('too large'))) {
         alert('Error: The uploaded image is too large. Please try a smaller image or contact support.');
       } else {
@@ -187,37 +208,25 @@ const BuyNowCheckout = () => {
     }
   };
 
-  if (!userEmail) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
-          <h2 className="text-2xl font-bold mb-4">Please Login to Checkout</h2>
-          <p className="mb-6 text-gray-600">You need to be logged in to complete your purchase.</p>
-          <button 
-            onClick={() => navigate('/login', { state: { from: location } })}
-            className="w-full bg-black text-white py-3 rounded-md font-medium hover:bg-gray-800 transition"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // Show loading if product is not loaded yet
   if (!product && cartItems.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
-          <h2 className="text-2xl font-bold mb-4">No Product Selected</h2>
-          <p className="mb-6 text-gray-600">Please select a product to proceed with Buy Now.</p>
-          <button 
-            onClick={() => navigate('/products')}
-            className="w-full bg-black text-white py-3 rounded-md font-medium hover:bg-gray-800 transition"
-          >
-            Browse Products
-          </button>
+      <>
+        <Header />
+        <div className="min-h-screen bg-[#fceadc] flex items-center justify-center p-4">
+          <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+            <h2 className="text-xl font-bold mb-4">Loading Product...</h2>
+            <p className="text-gray-600 mb-6">Please wait while we load your product details.</p>
+            <button 
+              onClick={() => navigate('/')}
+              className="w-full bg-black text-white py-3 rounded-md font-medium hover:bg-gray-800 transition"
+            >
+              Go to Home
+            </button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -246,20 +255,23 @@ const BuyNowCheckout = () => {
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Left: Form */}
             <div className="bg-[#FFF2EB] p-6 rounded-lg shadow-sm">
-              <h2 className="text-xl font-semibold mb-6 pb-2 border-b">Contact Information</h2>
+              <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Contact Information</h2>
               
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email*</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email*</label>
                 <input 
+                  id="email"
                   name="email" 
+                  type="email"
                   value={form.email} 
                   onChange={handleChange} 
-                  disabled 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-black focus:border-black text-sm sm:text-base"
+                  placeholder="Enter your email address"
+                  className={`w-full px-4 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                 />
+                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
               </div>
 
-              <h2 className="text-xl font-semibold mb-6 pb-2 border-b">Shipping Address</h2>
+              <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Shipping Address</h2>
               
               <div className="grid gap-6">
                 <div>
@@ -281,6 +293,7 @@ const BuyNowCheckout = () => {
                     name="phone" 
                     value={form.phone}
                     onChange={handleChange}
+                    placeholder="e.g., 03001234567"
                     className={`w-full px-4 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                   />
                   {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
@@ -298,7 +311,7 @@ const BuyNowCheckout = () => {
                   {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">City*</label>
                     <input 
@@ -324,7 +337,7 @@ const BuyNowCheckout = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-1">Province/Region*</label>
                     <input 
@@ -348,14 +361,13 @@ const BuyNowCheckout = () => {
                     >
                       <option value="">Select Country</option>
                       <option value="PK">Pakistan</option>
-                      {/* Add more countries as needed */}
                     </select>
                     {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country}</p>}
                   </div>
                 </div>
               </div>
 
-              <h2 className="text-xl font-semibold mt-8 mb-6 pb-2 border-b">Shipping Method</h2>
+              <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Shipping Method</h2>
               
               <div className="space-y-4">
                 <label className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
@@ -376,10 +388,10 @@ const BuyNowCheckout = () => {
                 </label>
               </div>
 
-              <h2 className="text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
+              <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
               
               <div className="space-y-4">
-                {[ 'Bank Transfer'].map(method => (
+                {['Bank Transfer'].map(method => (
                   <label key={method} className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
                     <input
                       type="radio"
@@ -396,15 +408,14 @@ const BuyNowCheckout = () => {
 
               {form.paymentMethod === 'Bank Transfer' && (
                 <div className="mt-6 p-4 border border-blue-300 bg-blue-50 rounded-md">
-                  <h3 className="text-lg font-semibold mb-3">Bank Transfer Details</h3>
+                  <h3 className="text-base sm:text-lg font-semibold mb-3">Bank Transfer Details</h3>
                   <p className="text-gray-700 mb-4 text-sm sm:text-base">
                     Please transfer the total amount of PKR {total.toLocaleString()} to our bank account:
                   </p>
                   <ul className="list-disc list-inside text-gray-800 mb-4 text-sm sm:text-base">
-               <li><strong>Bank Name:</strong> [HBL]</li>
-                    <li><strong>Account Name:</strong> [Maham Sarwar]</li>
-                    <li><strong>Account Number:</strong> [02947902132799]</li>
-                    {/* <li><strong>IBAN:</strong> [Your IBAN]</li> */}
+                    <li><strong>Bank Name:</strong> HBL</li>
+                    <li><strong>Account Name:</strong> Maham Sarwar</li>
+                    <li><strong>Account Number:</strong> 02947902132799</li>
                   </ul>
                   <p className="text-gray-700 mb-4 text-sm sm:text-base">
                     After making the transfer, please upload a screenshot of the transaction as proof of payment.
@@ -418,7 +429,7 @@ const BuyNowCheckout = () => {
                       type="file"
                       accept="image/*"
                       onChange={handleFileChange}
-                      className={`w-full px-4 py-2 border ${errors.bankTransferProof ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100`}
+                      className={`w-full px-4 py-2 border ${errors.bankTransferProof ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                     />
                     {errors.bankTransferProof && <p className="mt-1 text-sm text-red-600">{errors.bankTransferProof}</p>}
                     {bankTransferProofBase64 && (
@@ -448,7 +459,10 @@ const BuyNowCheckout = () => {
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:ring-black focus:border-black text-sm sm:text-base"
                     placeholder="Enter promo code"
                   />
-                  <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-r-md hover:bg-gray-300 transition text-sm sm:text-base">
+                  <button 
+                    type="button"
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-r-md hover:bg-gray-300 transition text-sm sm:text-base"
+                  >
                     Apply
                   </button>
                 </div>
@@ -470,7 +484,7 @@ const BuyNowCheckout = () => {
 
             {/* Right: Order Summary */}
             <div className="bg-[#FFF2EB] p-6 rounded-lg shadow-sm h-fit lg:sticky lg:top-8">
-              <h2 className="text-xl font-semibold mb-6 pb-2 border-b">Order Summary</h2>
+              <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Order Summary</h2>
               
               <div className="space-y-4 mb-6">
                 {cartItems.map(item => (
@@ -504,15 +518,13 @@ const BuyNowCheckout = () => {
                 
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Shipping</span>
-                  <span className="text-sm">
-                    PKR {shippingCost.toLocaleString()}
-                  </span>
+                  <span className="text-sm">PKR {shippingCost.toLocaleString()}</span>
                 </div>
                 
                 {form.promoCode && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Discount</span>
-                    <span className="text-sm text-green-600">-PKR 0</span> {/* Placeholder for actual discount logic */}
+                    <span className="text-sm text-green-600">-PKR 0</span>
                   </div>
                 )}
               </div>
@@ -525,7 +537,7 @@ const BuyNowCheckout = () => {
               <button
                 onClick={placeOrder}
                 disabled={loading || cartItems.length === 0 || convertingImage}
-                className={`mt-6 w-full py-3 px-4 rounded-md font-medium text-white ${loading || cartItems.length === 0 || convertingImage ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'} transition text-base sm:text-lg`}
+                className={`mt-6 w-full py-3 px-4 rounded-md font-medium text-white ${loading || cartItems.length === 0 || convertingImage ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'} transition text-base`}
               >
                 {loading || convertingImage ? (
                   <span className="flex items-center justify-center">

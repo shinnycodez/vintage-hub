@@ -8,14 +8,11 @@ import {
   deleteDoc,
   addDoc
 } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { db } from '../firebase';
 import Header from './Header';
 import { useNavigate } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
 
 const CheckoutPage = () => {
-  const [user, loadingAuth] = useAuthState(auth);
-  const userEmail = user?.email;
   const navigate = useNavigate();
 
   const [cartItems, setCartItems] = useState([]);
@@ -28,59 +25,49 @@ const CheckoutPage = () => {
     postalCode: '',
     region: '',
     country: '',
-    shippingMethod: 'Standard Delivery', // Only Standard Delivery now
-    paymentMethod: 'Cash on Delivery', // Default to Cash on Delivery
+    shippingMethod: 'Standard Delivery',
+    paymentMethod: 'Bank Transfer',
     promoCode: '',
     notes: '',
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [bankTransferProofBase64, setBankTransferProofBase64] = useState(null); // State for the Base64 string
-  const [convertingImage, setConvertingImage] = useState(false); // State for image conversion
+  const [bankTransferProofBase64, setBankTransferProofBase64] = useState(null);
+  const [convertingImage, setConvertingImage] = useState(false);
 
-  // Show loading while auth state is being determined
-  if (loadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    );
-  }
-
-  // Redirect unauthenticated users to login
-  if (!userEmail) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4"> {/* Added p-4 for padding on small screens */}
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center"> {/* Added w-full */}
-          <h2 className="text-2xl font-bold mb-4">Please Login to Checkout</h2>
-          <p className="mb-6 text-gray-600">You need to be logged in to complete your purchase.</p>
-          <button
-            onClick={() => navigate('/login')}
-            className="w-full bg-black text-white py-3 rounded-md font-medium hover:bg-gray-800 transition"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Set form email once user is loaded
+  // Load cart items from localStorage or session storage
   useEffect(() => {
-    if (userEmail) {
-      setForm(prev => ({ ...prev, email: userEmail }));
-    }
-  }, [userEmail]);
+    const loadCartFromStorage = () => {
+      try {
+        // Try to get cart from localStorage first, then sessionStorage
+        const savedCart = localStorage.getItem('cartItems') || sessionStorage.getItem('cartItems');
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart);
+          setCartItems(parsedCart);
+        }
+      } catch (error) {
+        console.error('Error loading cart from storage:', error);
+        setCartItems([]);
+      }
+    };
 
-  // Load cart items
-  useEffect(() => {
-    if (!userEmail) return;
-    const q = query(collection(db, 'carts'), where('user', '==', userEmail));
-    const unsub = onSnapshot(q, (snapshot) => {
-      setCartItems(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
-    });
-    return unsub;
-  }, [userEmail]);
+    loadCartFromStorage();
+
+    // Listen for storage changes (if cart is updated in another tab)
+    const handleStorageChange = (e) => {
+      if (e.key === 'cartItems' && e.newValue) {
+        try {
+          const updatedCart = JSON.parse(e.newValue);
+          setCartItems(updatedCart);
+        } catch (error) {
+          console.error('Error parsing updated cart:', error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shippingCost = 300;
@@ -105,11 +92,11 @@ const CheckoutPage = () => {
     const file = e.target.files[0];
     if (file) {
       setConvertingImage(true);
-      setErrors(prev => ({ ...prev, bankTransferProof: '' })); // Clear error when file is selected
+      setErrors(prev => ({ ...prev, bankTransferProof: '' }));
 
       const reader = new FileReader();
       reader.onloadend = () => {
-        setBankTransferProofBase64(reader.result); // This is the Base64 string
+        setBankTransferProofBase64(reader.result);
         setConvertingImage(false);
       };
       reader.onerror = (error) => {
@@ -118,7 +105,7 @@ const CheckoutPage = () => {
         setConvertingImage(false);
         setErrors(prev => ({ ...prev, bankTransferProof: 'Failed to read image file.' }));
       };
-      reader.readAsDataURL(file); // Read file as Base64 string
+      reader.readAsDataURL(file);
     } else {
       setBankTransferProofBase64(null);
     }
@@ -126,12 +113,17 @@ const CheckoutPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    const requiredFields = ['fullName', 'phone', 'address', 'city', 'postalCode', 'country'];
+    const requiredFields = ['email', 'fullName', 'phone', 'address', 'city', 'postalCode', 'country'];
     requiredFields.forEach(field => {
       if (!form[field]) {
         newErrors[field] = 'This field is required';
       }
     });
+
+    // Email validation
+    if (form.email && !/\S+@\S+\.\S+/.test(form.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
 
     if (form.paymentMethod === 'Bank Transfer' && !bankTransferProofBase64) {
       newErrors.bankTransferProof = 'Please upload a screenshot of your bank transfer.';
@@ -141,15 +133,27 @@ const CheckoutPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const clearCart = () => {
+    // Clear cart from both storage options
+    localStorage.removeItem('cartItems');
+    sessionStorage.removeItem('cartItems');
+    setCartItems([]);
+  };
+
   const placeOrder = async () => {
     if (!validateForm()) return;
 
     setLoading(true);
 
+    // Generate a unique order ID for guest checkout
+    const orderId = 'ORDER_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
     const order = {
-      user: userEmail,
+      orderId,
+      customerType: 'guest', // Mark as guest order
+      customerEmail: form.email,
       items: cartItems.map(item => ({
-        productId: item.productId,
+        productId: item.productId || item.id,
         title: item.title,
         type: item.type,
         size: item.size,
@@ -176,18 +180,22 @@ const CheckoutPage = () => {
       total,
       createdAt: new Date(),
       status: 'processing',
-      // Store the Base64 string directly in the Firestore document
       bankTransferProofBase64: form.paymentMethod === 'Bank Transfer' ? bankTransferProofBase64 : null,
     };
 
     try {
-      // Attempt to add the document. It will fail if the Base64 string is too large.
       await addDoc(collection(db, 'orders'), order);
-      await Promise.all(cartItems.map(item => deleteDoc(doc(db, 'carts', item.id))));
+      
+      // Clear the cart after successful order
+      clearCart();
+      
+      // Store order ID for confirmation page
+      sessionStorage.setItem('lastOrderId', orderId);
+      sessionStorage.setItem('lastOrderEmail', form.email);
+      
       navigate('/order-confirmation');
     } catch (err) {
       console.error("Error placing order:", err);
-      // More specific error message for size limit
       if (err.code === 'resource-exhausted' || err.message.includes('too large')) {
         alert('Error: The uploaded image is too large. Please try a smaller image or contact support.');
       } else {
@@ -198,6 +206,29 @@ const CheckoutPage = () => {
     }
   };
 
+  // Show empty cart message if no items
+  if (cartItems.length === 0) {
+    return (
+      <>
+        <Header />
+        <div className="min-h-screen bg-[#fceadc] py-8 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center py-16">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
+              <p className="text-gray-600 mb-8">Add some items to your cart to proceed with checkout.</p>
+              <button
+                onClick={() => navigate('/')}
+                className="bg-black text-white px-8 py-3 rounded-md font-medium hover:bg-gray-800 transition"
+              >
+                Continue Shopping
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Header />
@@ -205,7 +236,7 @@ const CheckoutPage = () => {
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumbs */}
           <nav className="flex mb-8" aria-label="Breadcrumb">
-            <ol className="flex items-center space-x-2 text-sm sm:text-base"> {/* Adjusted font size for responsiveness */}
+            <ol className="flex items-center space-x-2 text-sm sm:text-base">
               <li>
                 <a href="/" className="text-gray-500 hover:text-gray-700">Home</a>
               </li>
@@ -218,25 +249,27 @@ const CheckoutPage = () => {
             </ol>
           </nav>
 
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">Checkout</h1> {/* Adjusted font size for responsiveness */}
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8"> {/* Changed to grid-cols-1 for mobile, then 2 for large screens */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left: Form */}
             <div className="bg-[#FFF2EB] p-6 rounded-lg shadow-sm">
-              <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Contact Information</h2> {/* Adjusted font size */}
+              <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Contact Information</h2>
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email*</label>
                 <input
                   name="email"
+                  type="email"
                   value={form.email}
                   onChange={handleChange}
-                  disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-black focus:border-black"
+                  placeholder="Enter your email address"
+                  className={`w-full px-4 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
                 />
+                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
               </div>
 
-              <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Shipping Address</h2> {/* Adjusted font size */}
+              <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Shipping Address</h2>
 
               <div className="grid gap-6">
                 <div>
@@ -272,7 +305,7 @@ const CheckoutPage = () => {
                   {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6"> {/* Changed md:grid-cols-2 to sm:grid-cols-2 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">City*</label>
                     <input
@@ -296,9 +329,9 @@ const CheckoutPage = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6"> {/* Changed md:grid-cols-2 to sm:grid-cols-2 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Province/Region*</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Province/Region</label>
                     <input
                       name="region"
                       value={form.region}
@@ -324,7 +357,7 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
-              <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Shipping Method</h2> {/* Adjusted font size */}
+              <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Shipping Method</h2>
 
               <div className="space-y-4">
                 <label className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
@@ -345,10 +378,10 @@ const CheckoutPage = () => {
                 </label>
               </div>
 
-              <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2> {/* Adjusted font size */}
+              <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
 
               <div className="space-y-4">
-                {[ 'Bank Transfer'].map(method => (
+                {['Bank Transfer'].map(method => (
                   <label key={method} className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
                     <input
                       type="radio"
@@ -365,17 +398,16 @@ const CheckoutPage = () => {
 
               {form.paymentMethod === 'Bank Transfer' && (
                 <div className="mt-6 p-4 border border-blue-300 bg-blue-50 rounded-md">
-                  <h3 className="text-base sm:text-lg font-semibold mb-3">Bank Transfer Details</h3> {/* Adjusted font size */}
-                  <p className="text-gray-700 text-sm sm:text-base mb-4"> {/* Adjusted font size */}
+                  <h3 className="text-base sm:text-lg font-semibold mb-3">Bank Transfer Details</h3>
+                  <p className="text-gray-700 text-sm sm:text-base mb-4">
                     Please transfer the total amount of PKR {total.toLocaleString()} to our bank account:
                   </p>
-                  <ul className="list-disc list-inside text-gray-800 text-sm sm:text-base mb-4"> {/* Adjusted font size */}
-                    <li><strong>Bank Name:</strong> [HBL]</li>
-                    <li><strong>Account Name:</strong> [Maham Sarwar]</li>
-                    <li><strong>Account Number:</strong> [02947902132799]</li>
-                    {/* <li><strong>IBAN:</strong> [Your IBAN]</li> */}
+                  <ul className="list-disc list-inside text-gray-800 text-sm sm:text-base mb-4">
+                    <li><strong>Bank Name:</strong> HBL</li>
+                    <li><strong>Account Name:</strong> Maham Sarwar</li>
+                    <li><strong>Account Number:</strong> 02947902132799</li>
                   </ul>
-                  <p className="text-gray-700 text-sm sm:text-base mb-4"> {/* Adjusted font size */}
+                  <p className="text-gray-700 text-sm sm:text-base mb-4">
                     After making the transfer, please upload a screenshot of the transaction as proof of payment.
                   </p>
                   <div>
@@ -435,20 +467,19 @@ const CheckoutPage = () => {
             </div>
 
             {/* Right: Order Summary */}
-            {/* On small screens, the order summary should be at the bottom, not sticky */}
             <div className="bg-[#FFF2EB] p-6 rounded-lg shadow-sm lg:h-fit lg:sticky lg:top-8">
-              <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Order Summary</h2> {/* Adjusted font size */}
+              <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Order Summary</h2>
 
               <div className="space-y-4 mb-6">
-                {cartItems.map(item => (
-                  <div key={item.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center"> {/* Adjusted for mobile stacking */}
-                    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center w-full"> {/* Adjusted for mobile stacking */}
+                {cartItems.map((item, index) => (
+                  <div key={item.id || index} className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center w-full">
                       <img
                         src={item.image}
                         alt={item.title}
                         className="w-20 h-25 object-top rounded flex-shrink-0"
                       />
-                      <div className="flex-1"> {/* Ensures content takes available space */}
+                      <div className="flex-1">
                         <p className="font-medium text-gray-900">{item.title}</p>
                         <p className="text-sm text-gray-500">
                           {item.type} | Size: {item.size} {item.lining && '| With Lining'}
@@ -456,7 +487,7 @@ const CheckoutPage = () => {
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
                     </div>
-                    <p className="font-medium mt-2 sm:mt-0 sm:ml-4"> {/* Added margin for mobile layout */}
+                    <p className="font-medium mt-2 sm:mt-0 sm:ml-4">
                       PKR {(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
@@ -471,9 +502,7 @@ const CheckoutPage = () => {
 
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Shipping</span>
-                  <span className="text-sm">
-                    PKR {shippingCost.toLocaleString()}
-                  </span>
+                  <span className="text-sm">PKR {shippingCost.toLocaleString()}</span>
                 </div>
 
                 {form.promoCode && (
@@ -485,8 +514,8 @@ const CheckoutPage = () => {
               </div>
 
               <div className="flex justify-between mt-4 pt-4 border-t border-gray-200">
-                <span className="font-medium text-base sm:text-lg">Total</span> {/* Adjusted font size */}
-                <span className="font-bold text-base sm:text-lg">PKR {total.toLocaleString()}</span> {/* Adjusted font size */}
+                <span className="font-medium text-base sm:text-lg">Total</span>
+                <span className="font-bold text-base sm:text-lg">PKR {total.toLocaleString()}</span>
               </div>
 
               <button
@@ -509,7 +538,7 @@ const CheckoutPage = () => {
                 )}
               </button>
 
-              <div className="mt-6 text-center text-xs sm:text-sm text-gray-500"> {/* Adjusted font size */}
+              <div className="mt-6 text-center text-xs sm:text-sm text-gray-500">
                 <p>100% secure checkout</p>
                 <p className="mt-1"></p>
               </div>

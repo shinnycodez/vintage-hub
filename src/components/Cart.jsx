@@ -1,44 +1,84 @@
 import React, { useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
-import { collection, query, where, onSnapshot, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db, auth } from '../firebase';
 import { Link } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
 
 const Cart = ({ isOpen, onClose }) => {
   const [cartItems, setCartItems] = useState([]);
-  const [user, loading] = useAuthState(auth);
 
+  // Load cart items from storage
   useEffect(() => {
-    if (loading || !user || !isOpen) return;
+    if (!isOpen) return;
 
-    const q = query(collection(db, 'carts'), where('user', '==', user.email));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setCartItems(items);
-    });
+    const loadCartFromStorage = () => {
+      try {
+        // Use the same key as checkout page
+        const storedCart = localStorage.getItem('cartItems') || sessionStorage.getItem('cartItems');
+        if (storedCart) {
+          const parsedCart = JSON.parse(storedCart);
+          setCartItems(parsedCart);
+        } else {
+          setCartItems([]);
+        }
+      } catch (error) {
+        console.error('Error loading cart from storage:', error);
+        setCartItems([]);
+      }
+    };
 
-    return () => unsubscribe();
-  }, [user, loading, isOpen]);
+    loadCartFromStorage();
 
-  const removeItem = async (id) => {
+    // Listen for storage changes (cart updates from other tabs or checkout)
+    const handleStorageChange = (e) => {
+      if (e.key === 'cartItems') {
+        try {
+          if (e.newValue) {
+            const updatedCart = JSON.parse(e.newValue);
+            setCartItems(updatedCart);
+          } else {
+            // Cart was cleared
+            setCartItems([]);
+          }
+        } catch (error) {
+          console.error('Error parsing updated cart:', error);
+          setCartItems([]);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [isOpen]);
+
+  // Save cart to storage
+  const saveCartToStorage = (updatedCart) => {
     try {
-      await deleteDoc(doc(db, 'carts', id));
+      const cartData = JSON.stringify(updatedCart);
+      localStorage.setItem('cartItems', cartData);
+      // Also save to sessionStorage as backup
+      sessionStorage.setItem('cartItems', cartData);
     } catch (error) {
-      console.error('Error removing item:', error);
+      console.error('Error saving cart to storage:', error);
     }
   };
 
-  const updateQuantity = async (id, newQuantity) => {
+  // Remove item from cart
+  const removeItem = (index) => {
+    const updatedCart = cartItems.filter((_, i) => i !== index);
+    setCartItems(updatedCart);
+    saveCartToStorage(updatedCart);
+  };
+
+  // Update quantity of item
+  const updateQuantity = (index, newQuantity) => {
     if (newQuantity < 1) return;
-    try {
-      await updateDoc(doc(db, 'carts', id), { quantity: newQuantity });
-    } catch (error) {
-      console.error('Error updating quantity:', error);
-    }
+
+    const updatedCart = [...cartItems];
+    updatedCart[index] = {
+      ...updatedCart[index],
+      quantity: newQuantity
+    };
+    setCartItems(updatedCart);
+    saveCartToStorage(updatedCart);
   };
 
   const total = cartItems.reduce(
@@ -51,7 +91,6 @@ const Cart = ({ isOpen, onClose }) => {
       className={`fixed top-0 right-0 h-full z-50 bg-[#FFF2EB] shadow-2xl transition-transform duration-300
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         w-full md:w-[400px]`}
-      style={{ willChange: 'transform' }}
     >
       <div className="relative h-full flex flex-col">
         <div className="flex items-center justify-between p-4 border-b">
@@ -60,13 +99,11 @@ const Cart = ({ isOpen, onClose }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {loading ? (
-            <p className="text-gray-500">Loading cart...</p>
-          ) : cartItems.length === 0 ? (
+          {cartItems.length === 0 ? (
             <p className="text-gray-500">Your cart is currently empty.</p>
           ) : (
-            cartItems.map((item) => (
-              <div key={item.id} className="flex items-start gap-4 p-3 border rounded-lg shadow-sm hover:shadow-md transition">
+            cartItems.map((item, index) => (
+              <div key={`${item.id || item.productId || index}-${index}`} className="flex items-start gap-4 p-3 border rounded-lg shadow-sm hover:shadow-md transition">
                 <img src={item.image} alt={item.title} className="w-20 h-30 object-top rounded" />
                 <div className="flex-1">
                   <h3 className="text-sm font-medium text-[#141414]">{item.title}</h3>
@@ -75,23 +112,24 @@ const Cart = ({ isOpen, onClose }) => {
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => updateQuantity(index, item.quantity - 1)}
                       disabled={item.quantity <= 1}
-                      className="px-2 py-1 border rounded disabled:opacity-50"
+                      className="px-2 py-1 border rounded disabled:opacity-50 hover:bg-gray-100 disabled:hover:bg-transparent"
                     >−</button>
-                    <span className="text-sm">{item.quantity}</span>
+                    <span className="text-sm min-w-[20px] text-center">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="px-2 py-1 border rounded"
+                      onClick={() => updateQuantity(index, item.quantity + 1)}
+                      className="px-2 py-1 border rounded hover:bg-gray-100"
                     >+</button>
                   </div>
                   <p className="text-gray-600 text-sm mt-1">
-                    Rs. {(item.price * item.quantity).toLocaleString()}
+                    PKR {(item.price * item.quantity).toLocaleString()}
                   </p>
                 </div>
                 <button
-                  onClick={() => removeItem(item.id)}
-                  className="text-red-500 hover:text-red-700 transition"
+                  onClick={() => removeItem(index)}
+                  className="text-red-500 hover:text-red-700 transition p-1"
+                  title="Remove item"
                 >
                   <FaTrashAlt />
                 </button>
@@ -104,7 +142,7 @@ const Cart = ({ isOpen, onClose }) => {
           <div className="flex justify-between items-center mb-3">
             <span className="text-sm text-gray-600">Total:</span>
             <span className="text-lg font-semibold text-[#141414]">
-              Rs. {total.toLocaleString()}
+              PKR {total.toLocaleString()}
             </span>
           </div>
           {cartItems.length > 0 ? (
