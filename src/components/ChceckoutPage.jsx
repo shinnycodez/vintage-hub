@@ -229,7 +229,7 @@ const CheckoutPage = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#fceadc] py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-[#fefaf9] py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumbs */}
           <nav className="flex mb-8" aria-label="Breadcrumb">
@@ -250,7 +250,7 @@ const CheckoutPage = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left: Form */}
-            <div className="bg-[#FFF2EB] p-6 rounded-lg shadow-sm">
+            <div className="bg-[#fefaf9] p-6 rounded-lg shadow-sm">
               <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Contact Information</h2>
 
               <div className="mb-6">
@@ -463,7 +463,7 @@ const CheckoutPage = () => {
             </div>
 
             {/* Right: Order Summary */}
-            <div className="bg-[#FFF2EB] p-6 rounded-lg shadow-sm lg:h-fit lg:sticky lg:top-8">
+            <div className="bg-[#fefaf9] p-6 rounded-lg shadow-sm lg:h-fit lg:sticky lg:top-8">
               <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Order Summary</h2>
 
               <div className="space-y-4 mb-6">
