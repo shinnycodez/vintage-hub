@@ -6,11 +6,11 @@ const ProductImageGrid = ({ images }) => {
   const [mainImage, setMainImage] = useState(validImages[0]);
 
   return (
-    <div className="w-full bg-[#FFDCDC] rounded-xl">
+    <div className="w-full bg-[#fceadc] rounded-xl">
       {/* Main Image */}
       {mainImage && (
         <div
-          className="w-full bg-center bg-no-repeat bg-contain bg-[#FFDCDC] rounded-t-xl mb-4 flex justify-center items-center"
+          className="w-full bg-center bg-no-repeat bg-contain bg-[#fcead] rounded-t-xl mb-4 flex justify-center items-center"
           style={{ backgroundImage: `url("${mainImage}")` }}
         >
           <div className="aspect-video w-full max-h-[600px] h-[50vh] sm:h-[70vh] md:h-[500px]"></div>

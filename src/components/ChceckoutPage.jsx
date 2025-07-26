@@ -201,7 +201,7 @@ const CheckoutPage = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#FFDCDC] py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-[#fceadc] py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumbs */}
           <nav className="flex mb-8" aria-label="Breadcrumb">
@@ -348,7 +348,7 @@ const CheckoutPage = () => {
               <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2> {/* Adjusted font size */}
 
               <div className="space-y-4">
-                {['Cash on Delivery', 'Bank Transfer'].map(method => (
+                {[ 'Bank Transfer'].map(method => (
                   <label key={method} className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
                     <input
                       type="radio"

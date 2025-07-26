@@ -44,9 +44,10 @@ const Header = () => {
 
           <div className="hidden md:flex items-center gap-5 lg:gap-9">
             <Link to="/" className="text-[#141414] text-sm font-medium transition">Home</Link>
-            <Link to="/products?category=Phone charm" className="text-[#141414] text-sm font-medium transition">Phone charm</Link>
-            <Link to="/products?category=Arm cuff" className="text-[#141414] text-sm font-medium  transition">Arm cuff</Link>
-            <Link to="/products?category=Bracelet" className="text-[#141414] text-sm font-medium  transition">Bracelet</Link>
+            <Link to="/products?category=Bracelets" className="text-[#141414] text-sm font-medium transition">Bracelets ˚⊹♡</Link>
+            <Link to="/products?category=Phone charms" className="text-[#141414] text-sm font-medium  transition">
+Phone charms ⋆｡𖦹°</Link>
+            <Link to="/products?category=Keychains" className="text-[#141414] text-sm font-medium  transition">keychains ˚⋆𐙚｡</Link>
             {adminEmails.includes(user?.email) && (
               <Link to="/admin" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Admin</Link>
             )}
@@ -87,9 +88,9 @@ const Header = () => {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center justify-center px-4 h-10 rounded-lg bg-[#141414] text-white text-sm font-semibold hover:opacity-90 transition"
+                className="flex items-center justify-center px-4 h-10 rounded-lg bg-white text-white text-sm font-semibold hover:opacity-90 transition"
               >
-                Login
+                <p className='text-black'>Login</p>
               </Link>
             )}
           </div>
@@ -130,9 +131,12 @@ const Header = () => {
                 </button>
               </div>
 
-              <Link to="/products?category=Phone charm" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Phone charm</Link>
-              <Link to="/products?category=Arm cuff" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Arm cuff</Link>
-              <Link to="/products?category=Bracelet" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Bracelet</Link>
+              <Link to="/products?category=Bracelets" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Bracelets ˚⊹♡</Link>
+              <Link to="/products?category=Phone charms" onClick={() => setIsMenuOpen(false)} className="blocsk px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Phone charms ⋆｡𖦹°
+</Link>
+              <Link to="/products?category=Keychains" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">
+keychains ˚⋆𐙚｡
+</Link>
 
               {adminEmails.includes(user?.email) && (
                 <Link to="/admin" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Admin</Link>
