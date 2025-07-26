@@ -22,7 +22,7 @@ const categories = [
       {
     id: 2,
     title: "keychains ˚⋆𐙚｡",
-    imageUrl: "https://scontent.flhe3-2.fna.fbcdn.net/v/t1.15752-9/515489899_1033519408660290_4290622129742427982_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=102&ccb=1-7&_nc_sid=0024fc&_nc_ohc=dAB1HpWGzuQQ7kNvwH_P9vD&_nc_oc=AdkdzdxInwB5Dwf7t0cIVvMg4blB_18rpHJc3fOXP4WnWm2THbacwxbW4CTyYtmjKd0&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe3-2.fna&oh=03_Q7cD2wGgu3d4vSjx4VxQbg1Al9nOMAmpokwwt5mAjJNnVprn3Q&oe=68AC26AE"
+    imageUrl: "https://scontent.flhe3-1.fna.fbcdn.net/v/t1.15752-9/521166975_734660132863062_8344427397155527878_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=108&ccb=1-7&_nc_sid=0024fc&_nc_ohc=_3dWxXDTf2AQ7kNvwH1m5H-&_nc_oc=AdkrOOuB66lOze65nVBUxtzwc30t81Apdwep51coHvlLCe3bNHXBtq_j8SyG158Us5Y&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe3-1.fna&oh=03_Q7cD2wEBc-JVrARW0JcO0ob47QmdjD5VNbxweJm9gTI_uFcHdQ&oe=68AC460B"
   },
       {
     id: 5,
@@ -52,7 +52,7 @@ function FeaturedCategories() {
         className="flex flex-col gap-2 group bg-white rounded-lg overflow-hidden shadow-sm transition-transform duration-300 group-hover:scale-[1.03]"
       >
         <div
-          className="w-full aspect-[1/1] bg-center bg-no-repeat bg-contain"
+          className="w-full aspect-[1/1] bg-center bg-no-repeat bg-cover"
           style={{ backgroundImage: `url(${category.imageUrl})` }}
         ></div>
         <p className="text-[#141414] text-base font-medium leading-normal text-center px-2 pb-3">
