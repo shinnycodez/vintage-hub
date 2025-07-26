@@ -36,10 +36,10 @@ const Header = () => {
 
   return (
     <>
-      <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] bg-[#FFF2EB] px-4 md:px-10 py-3 relative">
+      <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#ededed] bg-[#fceadc] px-4 md:px-10 py-3 relative">
         <div className="flex items-center gap-4 md:gap-8">
           <Link to="/" className="flex items-center gap-2 md:gap-4 text-[#141414]">
-            <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">ECLIPSEBYMS</h2>
+            <h2 className="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em]">VINTAGE HUB</h2>
           </Link>
 
           <div className="hidden md:flex items-center gap-5 lg:gap-9">

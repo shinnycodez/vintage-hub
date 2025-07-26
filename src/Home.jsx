@@ -7,7 +7,7 @@ import Footer from './components/Footer';
 function Home() {
   return (
     <div
-      className="relative flex size-full min-h-screen flex-col bg-[#FFDCDC] group/design-root overflow-x-hidden"
+      className="relative flex size-full min-h-screen flex-col bg-[#fceadc] group/design-root overflow-x-hidden"
       style={{ fontFamily: '"Noto Serif", "Noto Sans", sans-serif' }}
     >
       <div className="layout-container flex h-full grow flex-col">
