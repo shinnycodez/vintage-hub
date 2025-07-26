@@ -137,7 +137,7 @@ Phone charms ⋆｡𖦹°</Link>
               <Link to="/products?category=Keychains" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">
 keychains ˚⋆𐙚｡
 </Link>
-              <Link to="/products?category=Keychains" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Necklaces ｡°✩
+              <Link to="/products?category=Necklaces" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Necklaces ｡°✩
 </Link>
 
               {adminEmails.includes(user?.email) && (
