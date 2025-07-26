@@ -511,7 +511,7 @@ const CheckoutPage = () => {
 
               <div className="mt-6 text-center text-xs sm:text-sm text-gray-500"> {/* Adjusted font size */}
                 <p>100% secure checkout</p>
-                <p className="mt-1">Easy returns and exchanges</p>
+                <p className="mt-1"></p>
               </div>
             </div>
           </div>
