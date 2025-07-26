@@ -18,7 +18,9 @@ function Home() {
             <HeroBanner />
             <FeaturedCategories />
             <ShopTheLook />
-            <ContactForm/>
+                        <div>
+                  <ContactForm/>
+            </div>
             <Footer />
           </div>
         </div>

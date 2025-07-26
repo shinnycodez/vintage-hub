@@ -70,7 +70,7 @@ const CheckoutPage = () => {
   }, []);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shippingCost = 250;
+  const shippingCost = 230;
   const total = subtotal + shippingCost;
 
   const handleChange = (e) => {
@@ -369,7 +369,7 @@ const CheckoutPage = () => {
                   <div className="ml-3">
                     <p className="font-medium text-gray-900">Standard Delivery</p>
                     <p className="text-sm text-gray-500">
-                      PKR 300 - Delivery in 5-7 business days
+                      PKR 230 - Delivery in 4-5 business days
                     </p>
                   </div>
                 </label>
