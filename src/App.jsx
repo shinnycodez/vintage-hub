@@ -9,6 +9,7 @@ import AdminPortal from "./components/AdminPortal";
 import ProductPage from "./components/Productpage";
 import CheckoutPage from "./components/ChceckoutPage";
 import BuyNowCheckout from "./components/BuyNowCheckout";
+import OrderThankYou from "./components/OrderThankYou";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -54,7 +55,7 @@ function App() {
         <Route path="/buynowcheckout" element={<BuyNowCheckout />} />
         <Route path="/admin" element={<AdminPortal />} />
        <Route path="/checkout" element={<CheckoutPage />} />
-
+<Route path="/thanks" element={<OrderThankYou />} />
         {/* Protected Route */}
         
 

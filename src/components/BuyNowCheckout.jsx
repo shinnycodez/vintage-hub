@@ -192,7 +192,7 @@ const BuyNowCheckout = () => {
       sessionStorage.setItem('lastOrderEmail', form.email);
       sessionStorage.setItem('lastOrderType', 'buyNow');
       
-      navigate('/order-confirmation');
+      navigate('/thanks');
     } catch (err) {
       console.error("Error placing order:", err);
       if (err.code === 'resource-exhausted' || (err.message && err.message.includes('too large'))) {

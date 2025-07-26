@@ -182,15 +182,15 @@ const CheckoutPage = () => {
 
     try {
       await addDoc(collection(db, 'orders'), order);
-      
+
       // Clear the cart after successful order
       clearCart();
-      
+
       // Store order ID for confirmation page
       sessionStorage.setItem('lastOrderId', orderId);
       sessionStorage.setItem('lastOrderEmail', form.email);
-      
-      navigate('/order-confirmation');
+
+      navigate('/thanks');
     } catch (err) {
       console.error("Error placing order:", err);
       if (err.code === 'resource-exhausted' || err.message.includes('too large')) {
@@ -378,7 +378,7 @@ const CheckoutPage = () => {
               <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
 
               <div className="space-y-4">
-                {['EasyPaisa'].map(method => (
+                {['EasyPaisa', 'Cash on Delivery'].map(method => (
                   <label key={method} className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
                     <input
                       type="radio"
@@ -533,7 +533,7 @@ const CheckoutPage = () => {
 
               <div className="mt-6 text-center text-xs sm:text-sm text-gray-500">
                 <p>100% secure checkout</p>
-        
+
               </div>
             </div>
           </div>
