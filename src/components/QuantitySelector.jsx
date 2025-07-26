@@ -32,7 +32,7 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
           <div className="flex items-center gap-2 text-[#141414]">
             <button
               onClick={handleDecrement}
-              className="text-base font-medium leading-normal flex h-7 w-7 items-center justify-center rounded-full bg-[#FFE9DD] cursor-pointer"
+              className="text-base font-medium leading-normal flex h-7 w-7 items-center justify-center rounded-full bg-[#fefaf9] cursor-pointer"
             >
               −
             </button>
@@ -45,7 +45,7 @@ const QuantitySelector = ({ quantity, setQuantity }) => {
             />
             <button
               onClick={handleIncrement}
-              className="text-base font-medium leading-normal flex h-7 w-7 items-center justify-center rounded-full bg-[#FFE9DD] cursor-pointer"
+              className="text-base font-medium leading-normal flex h-7 w-7 items-center justify-center rounded-full bg-[#fefaf9] cursor-pointer"
             >
               +
             </button>
