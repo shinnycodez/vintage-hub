@@ -6,7 +6,8 @@ const ProductImageGrid = ({ images }) => {
   const [mainImage, setMainImage] = useState(validImages[0]);
 
   return (
-    <div className="w-full bg-[#fceadc] rounded-xl">
+    <div className="w-full bg-[
+#fefaf9] rounded-xl">
       {/* Main Image */}
       {mainImage && (
         <div

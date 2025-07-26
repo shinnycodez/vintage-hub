@@ -57,7 +57,8 @@ function SidebarFilters({ onFilterChange, onClose }) {
         {Object.keys(options).map((filter) => (
           <details
             key={filter}
-            className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#FFF2EB] px-[15px] py-[7px] group"
+            className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#
+#fefaf9] px-[15px] py-[7px] group"
           >
             <summary className="flex cursor-pointer items-center justify-between gap-6 py-2">
               <p className="text-[#141414] text-sm font-medium leading-normal">{filter}</p>
@@ -94,7 +95,8 @@ function SidebarFilters({ onFilterChange, onClose }) {
         {/* Price Range */}
         <details
           open
-          className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#FFF2EB] px-[15px] py-[7px] group"
+          className="flex flex-col rounded-lg border border-[#e0e0e0] bg-[#
+#fefaf9] px-[15px] py-[7px] group"
         >
           <summary className="flex cursor-pointer items-center justify-between gap-6 py-2">
             <p className="text-[#141414] text-sm font-medium leading-normal">Price Range</p>
@@ -111,7 +113,8 @@ function SidebarFilters({ onFilterChange, onClose }) {
                 min={0}
                 value={tempFilters.priceRange[0]}
                 onChange={(e) => handlePriceChange(0, e.target.value)}
-                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#FFF2EB]"
+                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#
+#fefaf9]"
               />
               <span className="text-sm text-[#757575]">to</span>
               <input
@@ -119,7 +122,8 @@ function SidebarFilters({ onFilterChange, onClose }) {
                 min={tempFilters.priceRange[0]}
                 value={tempFilters.priceRange[1]}
                 onChange={(e) => handlePriceChange(1, e.target.value)}
-                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#FFF2EB]"
+                className="w-20 px-2 py-1 border border-[#ccc] rounded text-sm bg-[#
+#fefaf9]"
               />
             </div>
           </div>

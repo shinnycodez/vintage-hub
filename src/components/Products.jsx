@@ -32,7 +32,8 @@ function Products() {
 
   return (
     <div
-      className="relative flex size-full min-h-screen flex-col bg-[#fceadc] group/design-root overflow-x-hidden"
+      className="relative flex size-full min-h-screen flex-col bg-[#
+#fefaf9] group/design-root overflow-x-hidden"
       style={{ fontFamily: '"Noto Serif", "Noto Sans", sans-serif' }}
     >
       <div className="layout-container flex h-full grow flex-col">
