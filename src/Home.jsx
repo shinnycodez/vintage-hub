@@ -3,6 +3,7 @@ import HeroBanner from './components/HeroBanner';
 import FeaturedCategories from './components/FeaturedCategories';
 import ShopTheLook from './components/ShopTheLook';
 import Footer from './components/Footer';
+import ContactForm from './components/ContactForm';
 
 function Home() {
   return (
@@ -17,6 +18,7 @@ function Home() {
             <HeroBanner />
             <FeaturedCategories />
             <ShopTheLook />
+            <ContactForm/>
             <Footer />
           </div>
         </div>

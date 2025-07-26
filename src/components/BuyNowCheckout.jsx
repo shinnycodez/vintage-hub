@@ -18,7 +18,7 @@ const BuyNowCheckout = () => {
     region: '',
     country: '',
     shippingMethod: 'Standard Delivery',
-    paymentMethod: 'Bank Transfer',
+    paymentMethod: 'EasyPaisa',
     promoCode: '',
     notes: '',
   });
@@ -62,8 +62,8 @@ const BuyNowCheckout = () => {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
     
-    // Clear the Base64 string if payment method changes from Bank Transfer
-    if (name === 'paymentMethod' && value !== 'Bank Transfer') {
+    // Clear the Base64 string if payment method changes from EasyPaisa
+    if (name === 'paymentMethod' && value !== 'EasyPaisa') {
       setBankTransferProofBase64(null);
       setErrors(prev => ({ ...prev, bankTransferProof: '' }));
     }
@@ -121,8 +121,8 @@ const BuyNowCheckout = () => {
       newErrors.phone = 'Please enter a valid phone number (at least 7 digits)';
     }
 
-    if (form.paymentMethod === 'Bank Transfer' && !bankTransferProofBase64) {
-      newErrors.bankTransferProof = 'Please upload a screenshot of your bank transfer.';
+    if (form.paymentMethod === 'EasyPaisa' && !bankTransferProofBase64) {
+      newErrors.bankTransferProof = 'Please upload a screenshot of your EasyPaisa transaction.';
     }
 
     setErrors(newErrors);
@@ -155,9 +155,6 @@ const BuyNowCheckout = () => {
       items: cartItems.map(item => ({
         productId: item.productId || item.id.replace('temp_', ''),
         title: item.title,
-        type: item.type,
-        size: item.size,
-        lining: item.lining,
         quantity: item.quantity || 1,
         price: item.price,
         image: item.image || item.coverImage,
@@ -181,7 +178,7 @@ const BuyNowCheckout = () => {
       createdAt: new Date(),
       status: 'processing',
       buyNow: true,
-      bankTransferProofBase64: form.paymentMethod === 'Bank Transfer' ? bankTransferProofBase64 : null,
+      bankTransferProofBase64: form.paymentMethod === 'EasyPaisa' ? bankTransferProofBase64 : null,
     };
 
     try {
@@ -391,7 +388,7 @@ const BuyNowCheckout = () => {
               <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
               
               <div className="space-y-4">
-                {['Bank Transfer'].map(method => (
+                {['EasyPaisa'].map(method => (
                   <label key={method} className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
                     <input
                       type="radio"
@@ -406,23 +403,22 @@ const BuyNowCheckout = () => {
                 ))}
               </div>
 
-              {form.paymentMethod === 'Bank Transfer' && (
+              {form.paymentMethod === 'EasyPaisa' && (
                 <div className="mt-6 p-4 border border-blue-300 bg-blue-50 rounded-md">
-                  <h3 className="text-base sm:text-lg font-semibold mb-3">Bank Transfer Details</h3>
+                  <h3 className="text-base sm:text-lg font-semibold mb-3">EasyPaisa Payment Details</h3>
                   <p className="text-gray-700 mb-4 text-sm sm:text-base">
-                    Please transfer the total amount of PKR {total.toLocaleString()} to our bank account:
+                    Please send the total amount of PKR {total.toLocaleString()} to our EasyPaisa account:
                   </p>
                   <ul className="list-disc list-inside text-gray-800 mb-4 text-sm sm:text-base">
-                    <li><strong>Bank Name:</strong> HBL</li>
                     <li><strong>Account Name:</strong> Maham Sarwar</li>
-                    <li><strong>Account Number:</strong> 02947902132799</li>
+                    <li><strong>EasyPaisa Number:</strong> 03001234567</li>
                   </ul>
                   <p className="text-gray-700 mb-4 text-sm sm:text-base">
-                    After making the transfer, please upload a screenshot of the transaction as proof of payment.
+                    After making the payment, please upload a screenshot of the transaction as proof of payment.
                   </p>
                   <div>
                     <label htmlFor="bankTransferProof" className="block text-sm font-medium text-gray-700 mb-1">
-                      Upload Bank Transfer Screenshot*
+                      Upload EasyPaisa Transaction Screenshot*
                     </label>
                     <input
                       id="bankTransferProof"
@@ -497,9 +493,6 @@ const BuyNowCheckout = () => {
                       />
                       <div>
                         <p className="font-medium text-gray-900 text-sm sm:text-base">{item.title}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">
-                          {item.type} | Size: {item.size} {item.lining && '| With Lining'}
-                        </p>
                         <p className="text-xs sm:text-sm text-gray-500">Qty: {item.quantity || 1}</p>
                       </div>
                     </div>
@@ -556,7 +549,6 @@ const BuyNowCheckout = () => {
 
               <div className="mt-6 text-center text-xs sm:text-sm text-gray-500">
                 <p>100% secure checkout</p>
-                <p className="mt-1">Easy returns and exchanges</p>
               </div>
             </div>
           </div>

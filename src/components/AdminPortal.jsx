@@ -247,7 +247,7 @@ function AdminPortal() {
     <div className="mt-4 space-y-3 text-sm text-gray-700 p-2 border-t border-gray-200 pt-3">
       <p><strong>Status:</strong> <span className={`font-semibold ${order.status === 'delivered' ? 'text-green-600' : 'text-orange-600'}`}>{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span></p>
       <p><strong>Payment Method:</strong> {order.payment}</p>
-      {order.payment === 'Bank Transfer' && order.bankTransferProofBase64 && (
+      {order.payment === 'EasyPaisa' && order.bankTransferProofBase64 && (
         <div className="mt-2">
           <strong>Bank Transfer Proof:</strong>
           <div
@@ -413,7 +413,7 @@ function AdminPortal() {
                           <div key={order.id} className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm mb-4 last:mb-0">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                               <div className="mb-2 sm:mb-0">
-                                <p className="font-semibold text-base sm:text-lg text-gray-900">Order by: {order.user}</p>
+                                <p className="font-semibold text-base sm:text-lg text-gray-900">Order by: {order.customerEmail}</p>
                                 <p className="text-sm text-gray-600">Total: PKR {order.total?.toLocaleString()}</p>
                                 <p className="text-sm text-gray-600">Payment: {order.payment}</p>
                               </div>
