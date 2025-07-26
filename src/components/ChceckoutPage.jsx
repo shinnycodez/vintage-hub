@@ -400,8 +400,8 @@ const CheckoutPage = () => {
                     Please transfer the total amount of PKR {total.toLocaleString()} to our EasyPaisa account:
                   </p>
                   <ul className="list-disc list-inside text-gray-800 text-sm sm:text-base mb-4">
-                    <li><strong>Account Name:</strong> Maham Sarwar</li>
-                    <li><strong>Account Number:</strong> 02947902132799</li>
+                    <li><strong>Account Name:</strong> </li>
+                    <li><strong>Account Number:</strong> Maham</li>
                   </ul>
                   <p className="text-gray-700 text-sm sm:text-base mb-4">
                     After making the transfer, please upload a screenshot of the transaction as proof of payment.

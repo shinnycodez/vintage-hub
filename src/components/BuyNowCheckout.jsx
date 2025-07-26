@@ -410,8 +410,8 @@ const BuyNowCheckout = () => {
                     Please send the total amount of PKR {total.toLocaleString()} to our EasyPaisa account:
                   </p>
                   <ul className="list-disc list-inside text-gray-800 mb-4 text-sm sm:text-base">
-                    <li><strong>Account Name:</strong> Maham Sarwar</li>
-                    <li><strong>EasyPaisa Number:</strong> 03001234567</li>
+                    <li><strong>Account Name:</strong> Maham </li>
+                    <li><strong>EasyPaisa Number:</strong> 03105816903</li>
                   </ul>
                   <p className="text-gray-700 mb-4 text-sm sm:text-base">
                     After making the payment, please upload a screenshot of the transaction as proof of payment.
