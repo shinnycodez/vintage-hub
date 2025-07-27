@@ -102,7 +102,7 @@ function ProductGrid({ filters = {} }) {
             <Link to={`/product/${product.id}`} key={product.id} className="h-full">
               <div className="flex flex-col h-full gap-3 pb-3 group shadow-md rounded-lg overflow-hidden transition-transform duration-300 hover:shadow-lg bg-[#FFF2EB]">
                 {/* Product image - fixed height */}
-                <div className="w-full aspect-[3/4] overflow-hidden">
+             <div className="w-full aspect-square overflow-hidden">
                   <img
                     src={product.coverImage || product.imageUrl}
                     alt={product.title}
@@ -111,7 +111,7 @@ function ProductGrid({ filters = {} }) {
                 </div>
 
                 {/* Product info - fixed height with consistent spacing */}
-                <div className="px-3 pb-4 flex flex-col justify-between h-[140px]"> {/* Fixed height for info section */}
+                <div className="px-3 pb-4 flex flex-col justify-between h-[130px]"> {/* Fixed height for info section */}
                   <div className="min-h-[60px] overflow-hidden"> {/* Fixed height for text */}
                     <p className="text-[#141414] text-base font-medium line-clamp-2"> {/* Limit to 2 lines */}
                       {product.title}
@@ -120,7 +120,7 @@ function ProductGrid({ filters = {} }) {
                       PKR {product.price}
                     </p>
                   </div>
-                  <button className="mt-auto py-2 px-4 rounded-full bg-black text-white text-sm font-semibold shadow-md hover:bg-gray-900 transition-all duration-200">
+                  <button className="mt-auto py-2 px-1 rounded-full bg-[#FCBACB] text-white text-sm font-semibold shadow-md hover:bg-gray-900 transition-all duration-200">
                     Buy Now
                   </button>
                 </div>

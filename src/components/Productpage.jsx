@@ -218,7 +218,7 @@ const ProductPage = ({ onOpenCart }) => {
                 disabled={!product.available || loading}
                 className={`w-full py-3 px-4 rounded-xl font-medium text-base transition-colors ${
                   product.available && !loading
-                    ? 'bg-black text-white hover:bg-gray-800'
+                    ? 'bg-[#FCBACB] text-white hover:bg-[#FCBACB]'
                     : 'bg-gray-400 text-white cursor-not-allowed'
                 }`}
               >
