@@ -208,7 +208,7 @@ const CheckoutPage = () => {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-[#fceadc] py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#FFF5EE] py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="text-center py-16">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
@@ -229,7 +229,7 @@ const CheckoutPage = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#fefaf9] py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-[#FFF5EE] py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumbs */}
           <nav className="flex mb-8" aria-label="Breadcrumb">
