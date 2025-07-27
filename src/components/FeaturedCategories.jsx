@@ -25,7 +25,7 @@ const categories = [
     id: 2,
     title: "keychains ˚⋆𐙚｡",
     imageUrl: "https://scontent.flhe3-1.fna.fbcdn.net/v/t1.15752-9/521166975_734660132863062_8344427397155527878_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=108&ccb=1-7&_nc_sid=0024fc&_nc_ohc=_3dWxXDTf2AQ7kNvwH1m5H-&_nc_oc=AdkrOOuB66lOze65nVBUxtzwc30t81Apdwep51coHvlLCe3bNHXBtq_j8SyG158Us5Y&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe3-1.fna&oh=03_Q7cD2wEBc-JVrARW0JcO0ob47QmdjD5VNbxweJm9gTI_uFcHdQ&oe=68AC460B",
-      link: "Keychains"
+      link: "keychains"
   },
       {
     id: 5,

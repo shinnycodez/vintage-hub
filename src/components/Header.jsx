@@ -47,7 +47,7 @@ const Header = () => {
             <Link to="/products?category=Bracelets" className="text-[#141414] text-sm font-medium transition">Bracelets ˚⊹♡</Link>
             <Link to="/products?category=Phone charms" className="text-[#141414] text-sm font-medium  transition">
 Phone charms ⋆｡𖦹°</Link>
-            <Link to="/products?category=Keychains" className="text-[#141414] text-sm font-medium  transition">keychains ˚⋆𐙚｡</Link>
+            <Link to="/products?category=keychains" className="text-[#141414] text-sm font-medium  transition">keychains ˚⋆𐙚｡</Link>
             {adminEmails.includes(user?.email) && (
               <Link to="/admin" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Admin</Link>
             )}
@@ -142,7 +142,7 @@ Phone charms ⋆｡𖦹°</Link>
               <Link to="/products?category=Bracelets" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Bracelets ˚⊹♡</Link>
               <Link to="/products?category=Phone charms" onClick={() => setIsMenuOpen(false)} className="blocsk px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Phone charms ⋆｡𖦹°
 </Link>
-              <Link to="/products?category=Keychains" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">
+              <Link to="/products?category=keychains" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">
 keychains ˚⋆𐙚｡
 </Link>
               <Link to="/products?category=Necklaces" onClick={() => setIsMenuOpen(false)} className="block px-4 py-3 hover:bg-[#FFE9DD] rounded-lg transition">Necklaces ｡°✩
