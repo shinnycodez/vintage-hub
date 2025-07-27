@@ -96,7 +96,7 @@ function ProductGrid({ filters = {} }) {
   <img
     src="https://scontent.flhe3-1.fna.fbcdn.net/v/t1.15752-9/520249943_1246640230543113_7697647323329758006_n.png?_nc_cat=111&ccb=1-7&_nc_sid=0024fc&_nc_ohc=u4zfdXOAvU4Q7kNvwFgQO4Y&_nc_oc=AdkCBcsCu4mxcEKuOl_1zSvdugQR2ORe21nAFRnIAw_Oq8DlfBc5hW_xYG97-RFL4TA&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe3-1.fna&oh=03_Q7cD2wGI7Dwg4sWjdP_TmjqU0SJCVWSGWBo96a5JvK2vNYrosw&oe=68AD7B9F"
     alt="category icon"
-    className="w-8 h-12 object-contain"
+    className="w-15 h-25 object-contain"
   />
 </div>
 
