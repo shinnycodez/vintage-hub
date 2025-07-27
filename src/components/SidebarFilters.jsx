@@ -144,6 +144,11 @@ function SidebarFilters({ onFilterChange, onClose }) {
             Clear
           </button>
         </div>
+                  <img
+  src="https://scontent.flhe7-1.fna.fbcdn.net/v/t1.15752-9/521434321_723434950653516_4695240504891457317_n.png?_nc_cat=101&ccb=1-7&_nc_sid=0024fc&_nc_ohc=NztkB-j-myQQ7kNvwFhssUB&_nc_oc=AdnRuI7C-NvMA7mZyTt7sOO83JammEZcuob_MPqphRYt4jnBZjOgOpfTlK_NTJkSr9o&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe7-1.fna&oh=03_Q7cD2wHVTpNl9jgZ_WFH_qtL94s3n5fVwd4M4GqpSVt5dOBHfw&oe=68AD625C"
+  alt="Cute filter doodle"
+  className="w-3/4 max-w-[200px] mx-auto mt-4"
+/>
       </div>
     </div>
   );
