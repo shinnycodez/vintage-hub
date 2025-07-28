@@ -113,7 +113,7 @@ const CheckoutPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    const requiredFields = ['email', 'fullName', 'phone', 'address', 'city', 'postalCode', 'country'];
+    const requiredFields = ['email', 'fullName', 'phone', 'address', 'city', 'country'];
     requiredFields.forEach(field => {
       if (!form[field]) {
         newErrors[field] = 'This field is required';

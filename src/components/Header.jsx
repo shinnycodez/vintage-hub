@@ -48,6 +48,7 @@ const Header = () => {
             <Link to="/products?category=Phone charms" className="text-[#141414] text-sm font-medium  transition">
 Phone charms ⋆｡𖦹°</Link>
             <Link to="/products?category=keychains" className="text-[#141414] text-sm font-medium  transition">keychains ˚⋆𐙚｡</Link>
+            <Link to="/products?category=Necklaces" className="text-[#141414] text-sm font-medium  transition">Necklaces ˚⋆𐙚｡</Link>
             {adminEmails.includes(user?.email) && (
               <Link to="/admin" className="text-[#141414] text-sm font-medium hover:text-[#0c77f2] transition">Admin</Link>
             )}

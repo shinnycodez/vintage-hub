@@ -103,7 +103,7 @@ const BuyNowCheckout = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    const requiredFields = ['email', 'fullName', 'phone', 'address', 'city', 'postalCode', 'region', 'country'];
+    const requiredFields = ['email', 'fullName', 'phone', 'address', 'city', 'region', 'country'];
     
     requiredFields.forEach(field => {
       if (!form[field]) {
