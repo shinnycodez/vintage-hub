@@ -103,7 +103,7 @@ const BuyNowCheckout = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    const requiredFields = ['email', 'fullName', 'phone', 'address', 'city', 'region', 'country'];
+    const requiredFields = [ 'fullName', 'phone', 'address', 'city', 'region', 'country'];
     
     requiredFields.forEach(field => {
       if (!form[field]) {
@@ -255,7 +255,7 @@ const BuyNowCheckout = () => {
               <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Contact Information</h2>
               
               <div className="mb-6">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email*</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input 
                   id="email"
                   name="email" 
@@ -322,7 +322,7 @@ const BuyNowCheckout = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-1">Postal Code*</label>
+                    <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
                     <input 
                       id="postalCode"
                       name="postalCode" 

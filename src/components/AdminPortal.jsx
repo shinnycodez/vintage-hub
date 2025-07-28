@@ -413,7 +413,9 @@ function AdminPortal() {
                           <div key={order.id} className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm mb-4 last:mb-0">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                               <div className="mb-2 sm:mb-0">
-                                <p className="font-semibold text-base sm:text-lg text-gray-900">Order by: {order.customerEmail}</p>
+                        <p className="font-semibold text-base sm:text-lg text-gray-900">
+  Order by: {order.shippingAddress?.fullName || order.customerEmail}
+</p>
                                 <p className="text-sm text-gray-600">Total: PKR {order.total?.toLocaleString()}</p>
                                 <p className="text-sm text-gray-600">Payment: {order.payment}</p>
                               </div>
@@ -458,7 +460,10 @@ function AdminPortal() {
                           <div key={order.id} className="border border-green-300 rounded-lg p-4 bg-green-50 shadow-sm mb-4 last:mb-0">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                               <div className="mb-2 sm:mb-0">
-                                <p className="font-semibold text-base sm:text-lg text-gray-900">Order by: {order.user}</p>
+                           <p className="font-semibold text-base sm:text-lg text-gray-900">
+  Order by: {order.shippingAddress?.fullName || order.user}
+</p>
+
                                 <p className="text-sm text-gray-600">Total: PKR {order.total?.toLocaleString()}</p>
                                 <p className="text-sm text-gray-600">Payment: {order.payment}</p>
                               </div>

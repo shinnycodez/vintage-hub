@@ -113,7 +113,7 @@ const CheckoutPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    const requiredFields = ['email', 'fullName', 'phone', 'address', 'city', 'country'];
+    const requiredFields = [ 'fullName', 'phone', 'address', 'city', 'country'];
     requiredFields.forEach(field => {
       if (!form[field]) {
         newErrors[field] = 'This field is required';
@@ -254,7 +254,7 @@ const CheckoutPage = () => {
               <h2 className="text-lg sm:text-xl font-semibold mb-6 pb-2 border-b">Contact Information</h2>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email*</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
                   name="email"
                   type="email"
@@ -315,7 +315,7 @@ const CheckoutPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code*</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
                     <input
                       name="postalCode"
                       value={form.postalCode}
