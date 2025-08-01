@@ -158,6 +158,11 @@ const CheckoutPage = () => {
         quantity: item.quantity,
         price: item.price,
         image: item.image,
+        // Store variation details
+        variation: item.variation || null,
+        type: item.type || null,
+        size: item.size || null,
+        lining: item.lining || false,
       })),
       shipping: form.shippingMethod,
       payment: form.paymentMethod,
@@ -400,8 +405,8 @@ const CheckoutPage = () => {
                     Please transfer the total amount of PKR {total.toLocaleString()} to our EasyPaisa account:
                   </p>
                   <ul className="list-disc list-inside text-gray-800 text-sm sm:text-base mb-4">
-                     <li><strong>Account Name:</strong> Maham </li>
-                    <li><strong>EasyPaisa Number:</strong> 03105816903</li>
+                     <li><strong>Account Name:</strong> Maham </li>
+                    <li><strong>EasyPaisa Number:</strong> 03105816903</li>
                   </ul>
                   <p className="text-gray-700 text-sm sm:text-base mb-4">
                     After making the transfer, please upload a screenshot of the transaction as proof of payment.
@@ -477,6 +482,27 @@ const CheckoutPage = () => {
                       />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{item.title}</p>
+                        
+                        {/* Display variation (color) if it exists */}
+                        {item.variation && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <span className="text-xs text-gray-500">Color:</span>
+                            <span className="text-xs font-medium text-gray-700">{item.variation}</span>
+                            {/* Optional: Show a small color swatch */}
+                            <div 
+                              className="w-3 h-3 rounded-full border border-gray-200"
+                              style={{ 
+                                backgroundColor: item.variation.toLowerCase(),
+                                display: /^#[0-9A-F]{6}$/i.test(item.variation) ? 'block' : 'none'
+                              }}
+                              title={item.variation}
+                            />
+                          </div>
+                        )}
+                        
+                        <p className="text-xs text-gray-500 mt-1">
+                          {item.type && `${item.type} |`} {item.size} {item.lining ? '| Lining' : ''}
+                        </p>
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
                     </div>

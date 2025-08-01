@@ -17,17 +17,20 @@ function AdminPortal() {
   const [productSales, setProductSales] = useState([]);
   const [totalSales, setTotalSales] = useState({ day: 0, month: 0, year: 0 });
 
-  const [formData, setFormData] = useState({
-    title: "",
-    price: "",
-    category: "",
-    description: "",
-    coverImage: "",
-    image1: "",
-    image2: "",
-    isTopProduct: false,
-    available: true,
-  });
+const [formData, setFormData] = useState({
+  title: "",
+  price: "",
+  category: "",
+  description: "",
+  coverImage: "",
+  image1: "",
+  image2: "",
+  isTopProduct: false,
+  available: true,
+  variationInput: "",      // for temporary input field
+  variations: [],          // array to hold variations like colors
+});
+
 
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -141,49 +144,62 @@ function AdminPortal() {
       }
     }
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setSuccessMsg("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccessMsg("");
-
-    try {
-      if (editId) {
-        await updateDoc(doc(db, "products", editId), {
-          ...formData,
-          price: parseFloat(formData.price),
-          images: [formData.image1, formData.image2],
-        });
-        setSuccessMsg("✅ Product updated successfully!");
-        setEditId(null);
-      } else {
-        await addDoc(collection(db, "products"), {
-          ...formData,
-          price: parseFloat(formData.price),
-          images: [formData.image1, formData.image2],
-          createdAt: serverTimestamp(),
-        });
-        setSuccessMsg("✅ Product added successfully!");
-      }
-
-      setFormData({
-        title: "",
-        price: "",
-        category: "",
-        description: "",
-        coverImage: "",
-        image1: "",
-        image2: "",
-        isTopProduct: false,
-        available: true,
+  try {
+    if (editId) {
+      await updateDoc(doc(db, "products", editId), {
+        title: formData.title,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        description: formData.description,
+        coverImage: formData.coverImage,
+        images: [formData.image1, formData.image2],
+        isTopProduct: formData.isTopProduct,
+        available: formData.available,
+        variations: formData.variations, // Explicitly include variations
       });
-    } catch (err) {
-      console.error("Error:", err);
-      setSuccessMsg("❌ Failed to submit.");
+      setSuccessMsg("✅ Product updated successfully!");
+      setEditId(null);
+    } else {
+      await addDoc(collection(db, "products"), {
+        title: formData.title,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        description: formData.description,
+        coverImage: formData.coverImage,
+        images: [formData.image1, formData.image2],
+        isTopProduct: formData.isTopProduct,
+        available: formData.available,
+        variations: formData.variations, // Include variations for new products
+        createdAt: serverTimestamp(),
+      });
+      setSuccessMsg("✅ Product added successfully!");
     }
 
-    setLoading(false);
-  };
+    setFormData({
+      title: "",
+      price: "",
+      category: "",
+      description: "",
+      coverImage: "",
+      image1: "",
+      image2: "",
+      isTopProduct: false,
+      available: true,
+      variations: [], // Reset variations
+      variationInput: "" // Reset input field
+    });
+  } catch (err) {
+    console.error("Error:", err);
+    setSuccessMsg("❌ Failed to submit.");
+  }
+
+  setLoading(false);
+};
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
@@ -195,22 +211,24 @@ function AdminPortal() {
     }
   };
 
-  const handleEdit = (product) => {
-    setFormData({
-      title: product.title,
-      price: product.price,
-      category: product.category,
-      description: product.description,
-      coverImage: product.coverImage,
-      image1: product.images?.[0] || "",
-      image2: product.images?.[1] || "",
-      isTopProduct: product.isTopProduct || false,
-      available: product.available !== false,
-    });
-    setEditId(product.id);
-    setShowForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+const handleEdit = (product) => {
+  setFormData({
+    title: product.title,
+    price: product.price,
+    category: product.category,
+    description: product.description,
+    coverImage: product.coverImage,
+    image1: product.images?.[0] || "",
+    image2: product.images?.[1] || "",
+    isTopProduct: product.isTopProduct || false,
+    available: product.available !== false,
+    variations: product.variations || [], // Add this line
+    variationInput: "" // Add this line
+  });
+  setEditId(product.id);
+  setShowForm(true);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
   const toggleExpand = (orderId) => {
     setExpandedOrders((prev) => ({
@@ -243,58 +261,62 @@ function AdminPortal() {
     );
   };
 
-  const OrderDetails = ({ order }) => (
-    <div className="mt-4 space-y-3 text-sm text-gray-700 p-2 border-t border-gray-200 pt-3">
-      <p><strong>Status:</strong> <span className={`font-semibold ${order.status === 'delivered' ? 'text-green-600' : 'text-orange-600'}`}>{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span></p>
-      <p><strong>Payment Method:</strong> {order.payment}</p>
-      {order.payment === 'EasyPaisa' && order.bankTransferProofBase64 && (
-        <div className="mt-2">
-          <strong>Bank Transfer Proof:</strong>
-          <div
-            className="mt-1 border border-gray-300 p-2 rounded max-w-full sm:max-w-xs overflow-hidden cursor-pointer hover:border-blue-500 transition-colors duration-200"
-            onClick={() => setViewingImage(order.bankTransferProofBase64)}
-          >
-            <img
-              src={order.bankTransferProofBase64}
-              alt="Bank Transfer Proof"
-              className="w-full h-auto object-contain max-h-64 sm:max-h-80"
-            />
-            <p className="text-center text-xs text-gray-500 mt-1">Click to enlarge</p>
-          </div>
-        </div>
-      )}
-      <p><strong>Shipping Method:</strong> {order.shipping}</p>
-      <p><strong>Promo Code:</strong> {order.promoCode || "None"}</p>
-      <p><strong>Notes:</strong> {order.notes || "None"}</p>
-      <p>
-        <strong>Order Time:</strong>{" "}
-        {order.createdAt?.toDate?.().toLocaleString() || "Unknown"}
-      </p>
-
-      <div>
-        <strong>Shipping Address:</strong>
-        <div className="ml-0 sm:ml-4 text-xs sm:text-sm">
-          <p>{order.shippingAddress?.fullName}</p>
-          <p>{order.shippingAddress?.address}</p>
-          <p>{order.shippingAddress?.city}, {order.shippingAddress?.region}</p>
-          <p>{order.shippingAddress?.country}, {order.shippingAddress?.postalCode}</p>
-          <p>Phone: {order.shippingAddress?.phone}</p>
+const OrderDetails = ({ order }) => (
+  <div className="mt-4 space-y-3 text-sm text-gray-700 p-2 border-t border-gray-200 pt-3">
+    <p><strong>Status:</strong> <span className={`font-semibold ${order.status === 'delivered' ? 'text-green-600' : 'text-orange-600'}`}>{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span></p>
+    <p><strong>Payment Method:</strong> {order.payment}</p>
+    {order.payment === 'EasyPaisa' && order.bankTransferProofBase64 && (
+      <div className="mt-2">
+        <strong>Bank Transfer Proof:</strong>
+        <div
+          className="mt-1 border border-gray-300 p-2 rounded max-w-full sm:max-w-xs overflow-hidden cursor-pointer hover:border-blue-500 transition-colors duration-200"
+          onClick={() => setViewingImage(order.bankTransferProofBase64)}
+        >
+          <img
+            src={order.bankTransferProofBase64}
+            alt="Bank Transfer Proof"
+            className="w-full h-auto object-contain max-h-64 sm:max-h-80"
+          />
+          <p className="text-center text-xs text-gray-500 mt-1">Click to enlarge</p>
         </div>
       </div>
+    )}
+    <p><strong>Shipping Method:</strong> {order.shipping}</p>
+    <p><strong>Promo Code:</strong> {order.promoCode || "None"}</p>
+    <p><strong>Notes:</strong> {order.notes || "None"}</p>
+    <p>
+      <strong>Order Time:</strong>{" "}
+      {order.createdAt?.toDate?.().toLocaleString() || "Unknown"}
+    </p>
 
-      <div>
-        <strong>Items:</strong>
-        <ul className="list-disc ml-4 sm:ml-5 mt-1 text-xs sm:text-sm">
-          {(order.items || []).map((item, i) => (
-            <li key={i}>
-              {item.title} – {item.type} – Size: {item.size} – Qty: {item.quantity} – Price: PKR {item.price?.toLocaleString()}
-            </li>
-          ))}
-        </ul>
+    <div>
+      <strong>Shipping Address:</strong>
+      <div className="ml-0 sm:ml-4 text-xs sm:text-sm">
+        <p>{order.shippingAddress?.fullName}</p>
+        <p>{order.shippingAddress?.address}</p>
+        <p>{order.shippingAddress?.city}, {order.shippingAddress?.region}</p>
+        <p>{order.shippingAddress?.country}, {order.shippingAddress?.postalCode}</p>
+        <p>Phone: {order.shippingAddress?.phone}</p>
       </div>
     </div>
-  );
 
+    <div>
+      <strong>Items:</strong>
+      <ul className="list-disc ml-4 sm:ml-5 mt-1 text-xs sm:text-sm">
+        {(order.items || []).map((item, i) => (
+          <li key={i}>
+            {item.title} – 
+            {item.variation && ` Color: ${item.variation} –`}
+            {item.type && ` Type: ${item.type} –`}
+            {item.size && ` Size: ${item.size} –`}
+            Qty: {item.quantity} – 
+            Price: PKR {item.price?.toLocaleString()}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+);
   return (
     <>
       <Header />
@@ -327,6 +349,58 @@ function AdminPortal() {
               <input name="coverImage" placeholder="Cover Image URL (e.g., Firebase Storage URL)" className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" value={formData.coverImage} onChange={handleChange} required />
               <input name="image1" placeholder="Image 1 URL (Optional)" className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" value={formData.image1} onChange={handleChange} />
               <input name="image2" placeholder="Image 2 URL (Optional)" className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" value={formData.image2} onChange={handleChange} />
+{/* Color Variations Input */}
+<div>
+  <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Product Variations (e.g., Red, Yellow)</label>
+  <div className="flex gap-2 mb-2">
+    <input
+      type="text"
+      name="variationInput"
+      value={formData.variationInput}
+      onChange={handleChange}
+      placeholder="Add a color (e.g., Red)"
+      className="flex-1 border border-gray-300 p-2 rounded-md text-sm sm:text-base"
+    />
+    <button
+      type="button"
+      onClick={() => {
+        if (formData.variationInput.trim()) {
+          setFormData((prev) => ({
+            ...prev,
+            variations: [...prev.variations, prev.variationInput.trim()],
+            variationInput: "",
+          }));
+        }
+      }}
+      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm sm:text-base"
+    >
+      Add
+    </button>
+  </div>
+
+  {/* Show list of variations */}
+{formData.variations && formData.variations.length > 0 && (
+    <div className="flex flex-wrap gap-2">
+      {formData.variations.map((v, i) => (
+        <span key={i} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2">
+          {v}
+          <button
+            type="button"
+            onClick={() =>
+              setFormData((prev) => ({
+                ...prev,
+                variations: prev.variations.filter((_, index) => index !== i),
+              }))
+            }
+            className="text-red-500 hover:text-red-700"
+          >
+            &times;
+          </button>
+        </span>
+      ))}
+    </div>
+  )}
+</div>
 
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-4">
                 <label className="flex items-center gap-2 text-sm sm:text-base text-gray-700 cursor-pointer">

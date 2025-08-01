@@ -107,9 +107,28 @@ const Cart = ({ isOpen, onClose }) => {
                 <img src={item.image} alt={item.title} className="w-20 h-30 object-top rounded" />
                 <div className="flex-1">
                   <h3 className="text-sm font-medium text-[#141414]">{item.title}</h3>
+                  
+                  {/* Display variation (color) if it exists */}
+                  {item.variation && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="text-xs text-gray-500">Color:</span>
+                      <span className="text-xs font-medium text-gray-700">{item.variation}</span>
+                      {/* Optional: Show a small color swatch */}
+                      <div 
+                        className="w-3 h-3 rounded-full border border-gray-200"
+                        style={{ 
+                          backgroundColor: item.variation.toLowerCase(),
+                          display: /^#[0-9A-F]{6}$/i.test(item.variation) ? 'block' : 'none'
+                        }}
+                        title={item.variation}
+                      />
+                    </div>
+                  )}
+                  
                   <p className="text-xs text-gray-500 mt-1">
-                    {item.type} | {item.size} {item.lining ? '| Lining' : ''}
+                    {item.type && `${item.type} |`} {item.size} {item.lining ? '| Lining' : ''}
                   </p>
+                  
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       onClick={() => updateQuantity(index, item.quantity - 1)}

@@ -16,6 +16,7 @@ const ProductPage = ({ onOpenCart }) => {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariation, setSelectedVariation] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +26,12 @@ const ProductPage = ({ onOpenCart }) => {
         const docRef = doc(db, 'products', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setProduct({ id: docSnap.id, ...docSnap.data() });
+          const productData = { id: docSnap.id, ...docSnap.data() };
+          setProduct(productData);
+          // Set the first variation as selected by default if variations exist
+          if (productData.variations && productData.variations.length > 0) {
+            setSelectedVariation(productData.variations[0]);
+          }
         } else {
           console.error('No such product!');
           navigate('/'); // Redirect to home if product not found
@@ -61,16 +67,22 @@ const ProductPage = ({ onOpenCart }) => {
   };
 
   const handleAddToCart = async () => {
-    if (loading) return;
+    if (loading || !product.available) return;
     setLoading(true);
 
+    // Create a unique identifier that includes the variation if it exists
+    const itemId = selectedVariation 
+      ? `${product.id}_${selectedVariation}_${Date.now()}`
+      : `${product.id}_${Date.now()}`;
+
     const cartItem = {
-      id: `${product.id}_${Date.now()}`,
+      id: itemId,
       productId: product.id,
       title: product.title,
       price: product.price,
       image: product.coverImage,
       quantity,
+      variation: selectedVariation, // Include the selected variation
       createdAt: new Date().toISOString(),
     };
 
@@ -80,7 +92,8 @@ const ProductPage = ({ onOpenCart }) => {
 
       // Check if item with same configuration already exists
       const existingIndex = currentCart.findIndex(item =>
-        item.productId === cartItem.productId
+        item.productId === cartItem.productId && 
+        item.variation === cartItem.variation
       );
 
       if (existingIndex !== -1) {
@@ -110,7 +123,7 @@ const ProductPage = ({ onOpenCart }) => {
   };
 
   const handleBuyNow = () => {
-    if (loading) return;
+    if (loading || !product.available) return;
 
     const buyNowItem = {
       id: product.id,
@@ -119,6 +132,7 @@ const ProductPage = ({ onOpenCart }) => {
       price: product.price,
       image: product.coverImage,
       quantity,
+      variation: selectedVariation, // Include the selected variation
       createdAt: new Date().toISOString(),
     };
 
@@ -133,8 +147,7 @@ const ProductPage = ({ onOpenCart }) => {
   };
 
   if (!product) return (
-    <div className="min-h-screen bg-[
-#FFF5EE] flex items-center justify-center">
+    <div className="min-h-screen bg-[#FFF5EE] flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
         <p className="text-gray-600">Loading product...</p>
@@ -186,6 +199,29 @@ const ProductPage = ({ onOpenCart }) => {
               <p className="text-green-600 font-medium px-4">In Stock</p>
             ) : (
               <p className="text-red-600 font-medium px-4">Out of Stock</p>
+            )}
+
+            {/* Color Variations Selector */}
+            {product.variations && product.variations.length > 0 && (
+              <div className="px-4 py-3">
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Color:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.variations.map((variation) => (
+                    <button
+                      key={variation}
+                      type="button"
+                      onClick={() => setSelectedVariation(variation)}
+                      className={`px-3 py-1 rounded-full text-sm border ${
+                        selectedVariation === variation
+                          ? 'bg-black text-white border-black'
+                          : 'bg-white text-gray-800 border-gray-300 hover:border-gray-400'
+                      } transition-colors duration-200`}
+                    >
+                      {variation}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
 
             <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
