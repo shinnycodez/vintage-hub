@@ -31,21 +31,38 @@ const [formData, setFormData] = useState({
   variations: [],          // array to hold variations like colors
 });
 
-
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [contacts, setContacts] = useState([]); // New state for contacts
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [editId, setEditId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
+  const [showContacts, setShowContacts] = useState(false); // New state for contacts visibility
   const [expandedOrders, setExpandedOrders] = useState({});
+  const [expandedContacts, setExpandedContacts] = useState({}); // New state for expanded contacts
   const [viewingImage, setViewingImage] = useState(null); // State for image viewer
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "products"), (snapshot) => {
       setProducts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // New useEffect for contacts
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "contacts"), (snapshot) => {
+      const contactsData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      // Sort by timestamp (newest first)
+      contactsData.sort((a, b) => {
+        const aTime = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(0);
+        const bTime = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(0);
+        return bTime - aTime;
+      });
+      setContacts(contactsData);
     });
     return () => unsubscribe();
   }, []);
@@ -144,6 +161,19 @@ const [formData, setFormData] = useState({
       }
     }
   };
+
+  // New function to delete contact
+  const deleteContact = async (contactId) => {
+    if (confirm("Are you sure you want to delete this contact message? This action cannot be undone.")) {
+      try {
+        await deleteDoc(doc(db, "contacts", contactId));
+        console.log(`Contact ${contactId} deleted successfully.`);
+      } catch (err) {
+        console.error("Failed to delete contact:", err);
+      }
+    }
+  };
+
 const handleSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);
@@ -237,6 +267,14 @@ const handleEdit = (product) => {
     }));
   };
 
+  // New function to toggle contact expansion
+  const toggleContactExpand = (contactId) => {
+    setExpandedContacts((prev) => ({
+      ...prev,
+      [contactId]: !prev[contactId],
+    }));
+  };
+
   // Image Viewer Modal Component
   const ImageViewer = ({ imageUrl, onClose }) => {
     if (!imageUrl) return null;
@@ -317,6 +355,29 @@ const OrderDetails = ({ order }) => (
     </div>
   </div>
 );
+
+  // New ContactDetails component
+  const ContactDetails = ({ contact }) => (
+    <div className="mt-4 space-y-3 text-sm text-gray-700 p-4 border-t border-gray-200 pt-3 bg-pink-50 rounded-lg">
+      <div>
+        <strong>📧 Email:</strong>
+        <p className="text-blue-600 hover:text-blue-800">
+          <a href={`mailto:${contact.email}`}>{contact.email}</a>
+        </p>
+      </div>
+      <div>
+        <strong>💌 Message:</strong>
+        <p className="mt-1 p-3 bg-white border border-pink-200 rounded-md whitespace-pre-wrap">
+          {contact.message}
+        </p>
+      </div>
+      <p>
+        <strong>🕒 Received:</strong>{" "}
+        {contact.timestamp?.toDate?.().toLocaleString() || "Unknown"}
+      </p>
+    </div>
+  );
+
   return (
     <>
       <Header />
@@ -349,6 +410,7 @@ const OrderDetails = ({ order }) => (
               <input name="coverImage" placeholder="Cover Image URL (e.g., Firebase Storage URL)" className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" value={formData.coverImage} onChange={handleChange} required />
               <input name="image1" placeholder="Image 1 URL (Optional)" className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" value={formData.image1} onChange={handleChange} />
               <input name="image2" placeholder="Image 2 URL (Optional)" className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" value={formData.image2} onChange={handleChange} />
+
 {/* Color Variations Input */}
 <div>
   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Product Variations (e.g., Red, Yellow)</label>
@@ -446,6 +508,9 @@ const OrderDetails = ({ order }) => (
                       <p className="text-sm text-gray-700">Price: PKR {product.price?.toLocaleString()}</p>
                       <p className="text-sm text-gray-700">Category: {product.category}</p>
                       <p className="text-sm text-gray-700">Top Product: {product.isTopProduct ? "Yes" : "No"}</p>
+                      {product.variations && product.variations.length > 0 && (
+                        <p className="text-sm text-gray-700">Variations: {product.variations.join(', ')}</p>
+                      )}
                       <p className="text-sm mt-1">Status: <span className={`font-medium ${product.available === false ? 'text-red-600' : 'text-green-600'}`}>
                         {product.available === false ? 'Out of Stock' : 'Available'}
                       </span></p>
@@ -565,6 +630,65 @@ const OrderDetails = ({ order }) => (
                     )}
                   </div>
                 </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* New Contact Messages Section */}
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+          <button
+            onClick={() => setShowContacts(!showContacts)}
+            className="w-full bg-black text-white px-4 py-3 text-left rounded-md hover:bg-gray-800 transition-colors duration-200 flex items-center justify-between text-base sm:text-lg font-medium"
+          >
+            <span>{showContacts ? "➖ Hide Contact Messages" : "💌 View Contact Messages"} ({contacts.length})</span>
+            <svg className={`w-5 h-5 transition-transform duration-200 ${showContacts ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+          </button>
+
+          {showContacts && (
+            <div className="mt-4 bg-gray-50 p-4 sm:p-6 rounded-lg shadow-inner space-y-4">
+              {contacts.length === 0 ? (
+                <p className="text-center text-gray-500 text-sm sm:text-base py-4">No contact messages received yet.</p>
+              ) : (
+                contacts.map((contact) => (
+                  <div key={contact.id} className="border border-pink-200 rounded-lg p-4 bg-pink-50 shadow-sm">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                      <div className="mb-2 sm:mb-0">
+                        <p className="font-semibold text-base sm:text-lg text-gray-900 flex items-center gap-2">
+                          🌸 {contact.name}
+                        </p>
+                        <p className="text-sm text-gray-600">📧 {contact.email}</p>
+                        <p className="text-sm text-gray-600">
+                          🕒 {contact.timestamp?.toDate?.().toLocaleString() || "Unknown"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 mt-2 sm:mt-0">
+                        <button
+                          className="text-sm text-blue-600 hover:text-blue-800 underline transition-colors duration-200"
+                          onClick={() => toggleContactExpand(contact.id)}
+                        >
+                          {expandedContacts[contact.id] ? "Hide Message" : "View Message"}
+                        </button>
+                        <a
+                          href={`mailto:${contact.email}?subject=Re: Your message&body=Hi ${contact.name},%0D%0A%0D%0AThank you for your message...`}
+                          className="bg-pink-500 hover:bg-pink-600 text-white px-3 py-1 text-sm rounded-md transition-colors duration-200"
+                        >
+                          📧 Reply
+                        </a>
+                        <button
+                          onClick={() => deleteContact(contact.id)}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-sm rounded-md transition-colors duration-200"
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    </div>
+
+                    {expandedContacts[contact.id] && (
+                      <ContactDetails contact={contact} />
+                    )}
+                  </div>
+                ))
               )}
             </div>
           )}
