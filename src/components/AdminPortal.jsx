@@ -28,7 +28,7 @@ const [formData, setFormData] = useState({
   isTopProduct: false,
   available: true,
   variationInput: "",      // for temporary input field
-  variations: [],          // array to hold variations like colors
+  variations: [],          // array to hold variations with stock status
 });
 
   const [products, setProducts] = useState([]);
@@ -190,7 +190,7 @@ const handleSubmit = async (e) => {
         images: [formData.image1, formData.image2],
         isTopProduct: formData.isTopProduct,
         available: formData.available,
-        variations: formData.variations, // Explicitly include variations
+        variations: formData.variations, // Now includes stock status for each variation
       });
       setSuccessMsg("✅ Product updated successfully!");
       setEditId(null);
@@ -204,7 +204,7 @@ const handleSubmit = async (e) => {
         images: [formData.image1, formData.image2],
         isTopProduct: formData.isTopProduct,
         available: formData.available,
-        variations: formData.variations, // Include variations for new products
+        variations: formData.variations, // Include variations with stock status
         createdAt: serverTimestamp(),
       });
       setSuccessMsg("✅ Product added successfully!");
@@ -242,6 +242,17 @@ const handleSubmit = async (e) => {
   };
 
 const handleEdit = (product) => {
+  // Convert old variation format to new format if needed
+  const processedVariations = product.variations ? product.variations.map(variation => {
+    if (typeof variation === 'string') {
+      // Old format - convert to new format
+      return { name: variation, inStock: true };
+    } else {
+      // New format - keep as is
+      return variation;
+    }
+  }) : [];
+
   setFormData({
     title: product.title,
     price: product.price,
@@ -252,13 +263,44 @@ const handleEdit = (product) => {
     image2: product.images?.[1] || "",
     isTopProduct: product.isTopProduct || false,
     available: product.available !== false,
-    variations: product.variations || [], // Add this line
-    variationInput: "" // Add this line
+    variations: processedVariations,
+    variationInput: ""
   });
   setEditId(product.id);
   setShowForm(true);
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
+
+  // Function to toggle stock status for individual variations
+  const toggleVariationStock = async (productId, variationIndex) => {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+
+    const updatedVariations = [...(product.variations || [])];
+    
+    // Handle both old and new format
+    if (typeof updatedVariations[variationIndex] === 'string') {
+      // Convert old format to new format
+      updatedVariations[variationIndex] = {
+        name: updatedVariations[variationIndex],
+        inStock: false // Toggle to false since we're clicking to change stock
+      };
+    } else {
+      // New format - toggle stock status
+      updatedVariations[variationIndex] = {
+        ...updatedVariations[variationIndex],
+        inStock: !updatedVariations[variationIndex].inStock
+      };
+    }
+
+    try {
+      await updateDoc(doc(db, "products", productId), {
+        variations: updatedVariations
+      });
+    } catch (err) {
+      console.error("Failed to update variation stock:", err);
+    }
+  };
 
   const toggleExpand = (orderId) => {
     setExpandedOrders((prev) => ({
@@ -411,7 +453,7 @@ const OrderDetails = ({ order }) => (
               <input name="image1" placeholder="Image 1 URL (Optional)" className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" value={formData.image1} onChange={handleChange} />
               <input name="image2" placeholder="Image 2 URL (Optional)" className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" value={formData.image2} onChange={handleChange} />
 
-{/* Color Variations Input */}
+{/* Color Variations Input - Updated */}
 <div>
   <label className="block text-sm sm:text-base font-medium text-gray-700 mb-1">Product Variations (e.g., Red, Yellow)</label>
   <div className="flex gap-2 mb-2">
@@ -429,7 +471,7 @@ const OrderDetails = ({ order }) => (
         if (formData.variationInput.trim()) {
           setFormData((prev) => ({
             ...prev,
-            variations: [...prev.variations, prev.variationInput.trim()],
+            variations: [...prev.variations, { name: prev.variationInput.trim(), inStock: true }],
             variationInput: "",
           }));
         }
@@ -440,26 +482,50 @@ const OrderDetails = ({ order }) => (
     </button>
   </div>
 
-  {/* Show list of variations */}
-{formData.variations && formData.variations.length > 0 && (
+  {/* Show list of variations with stock toggle - Updated */}
+  {formData.variations && formData.variations.length > 0 && (
     <div className="flex flex-wrap gap-2">
-      {formData.variations.map((v, i) => (
-        <span key={i} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2">
-          {v}
-          <button
-            type="button"
-            onClick={() =>
-              setFormData((prev) => ({
-                ...prev,
-                variations: prev.variations.filter((_, index) => index !== i),
-              }))
-            }
-            className="text-red-500 hover:text-red-700"
-          >
-            &times;
-          </button>
-        </span>
-      ))}
+      {formData.variations.map((variation, i) => {
+        const variationName = typeof variation === 'string' ? variation : variation.name;
+        const isInStock = typeof variation === 'string' ? true : variation.inStock;
+        
+        return (
+          <div key={i} className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 ${isInStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            <span>{variationName}</span>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData((prev) => ({
+                  ...prev,
+                  variations: prev.variations.map((v, index) => {
+                    if (index === i) {
+                      return typeof v === 'string' 
+                        ? { name: v, inStock: false }
+                        : { ...v, inStock: !v.inStock };
+                    }
+                    return v;
+                  })
+                }));
+              }}
+              className={`text-xs px-2 py-1 rounded-full ${isInStock ? 'bg-green-200 hover:bg-green-300 text-green-800' : 'bg-red-200 hover:bg-red-300 text-red-800'}`}
+            >
+              {isInStock ? '✓ In Stock' : '✗ Out of Stock'}
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  variations: prev.variations.filter((_, index) => index !== i),
+                }))
+              }
+              className="text-red-500 hover:text-red-700 font-bold"
+            >
+              &times;
+            </button>
+          </div>
+        );
+      })}
     </div>
   )}
 </div>
@@ -508,9 +574,35 @@ const OrderDetails = ({ order }) => (
                       <p className="text-sm text-gray-700">Price: PKR {product.price?.toLocaleString()}</p>
                       <p className="text-sm text-gray-700">Category: {product.category}</p>
                       <p className="text-sm text-gray-700">Top Product: {product.isTopProduct ? "Yes" : "No"}</p>
+                      
+                      {/* Updated Variations Display with Individual Stock Management */}
                       {product.variations && product.variations.length > 0 && (
-                        <p className="text-sm text-gray-700">Variations: {product.variations.join(', ')}</p>
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-700 mb-1">Variations:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {product.variations.map((variation, index) => {
+                              const variationName = typeof variation === 'string' ? variation : variation.name;
+                              const isInStock = typeof variation === 'string' ? true : variation.inStock;
+                              
+                              return (
+                                <button
+                                  key={index}
+                                  onClick={() => toggleVariationStock(product.id, index)}
+                                  className={`text-xs px-2 py-1 rounded-full transition-colors duration-200 ${
+                                    isInStock 
+                                      ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                      : 'bg-red-100 text-red-800 hover:bg-red-200'
+                                  }`}
+                                  title={`Click to mark as ${isInStock ? 'out of stock' : 'in stock'}`}
+                                >
+                                  {variationName} {isInStock ? '✓' : '✗'}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
                       )}
+                      
                       <p className="text-sm mt-1">Status: <span className={`font-medium ${product.available === false ? 'text-red-600' : 'text-green-600'}`}>
                         {product.available === false ? 'Out of Stock' : 'Available'}
                       </span></p>
