@@ -243,10 +243,10 @@ const ProductPage = ({ onOpenCart }) => {
                 <p className="text-green-600 font-medium px-4">In Stock</p>
               )
             ) : (
-              <p className="text-red-600 font-medium px-4">Out of Stock</p>
+              <p className="text-red-600 font-medium px-4">Will be available soon</p>
             )}
 
-            {/* Color Variations Selector with Stock Status */}
+            {/* Color Variations Selector - Simplified */}
             {product.variations && product.variations.length > 0 && (
               <div className="px-4 py-3">
                 <h3 className="text-sm font-medium text-gray-900 mb-2">Color:</h3>
@@ -259,44 +259,22 @@ const ProductPage = ({ onOpenCart }) => {
                       <button
                         key={index}
                         type="button"
-                        onClick={() => setSelectedVariation(variationName)}
+                        onClick={() => isInStock && setSelectedVariation(variationName)}
                         disabled={!isInStock}
-                        className={`px-3 py-1 rounded-full text-sm border relative transition-colors duration-200 ${
+                        className={`px-3 py-1 rounded-full text-sm border transition-all duration-200 ${
                           selectedVariation === variationName
                             ? isInStock 
                               ? 'bg-black text-white border-black'
-                              : 'bg-gray-500 text-white border-gray-500'
+                              : 'bg-gray-300 text-gray-500 border-gray-300'
                             : isInStock
-                              ? 'bg-white text-gray-800 border-gray-300 hover:border-gray-400'
-                              : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                              ? 'bg-white text-gray-800 border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+                              : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50'
                         }`}
                       >
                         {variationName}
-                        {!isInStock && (
-                          <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                        )}
-                        {!isInStock && (
-                          <span className="absolute inset-0 flex items-center justify-center text-xs text-red-600 font-bold opacity-75">
-                            ✗
-                          </span>
-                        )}
                       </button>
                     );
                   })}
-                </div>
-                
-                {/* Stock status legend */}
-                <div className="mt-2 text-xs text-gray-600">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span>In Stock</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                      <span>Out of Stock</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
@@ -322,7 +300,7 @@ const ProductPage = ({ onOpenCart }) => {
                     Adding...
                   </span>
                 ) : !availableForPurchase ? (
-                  selectedVariation && !isSelectedVariationInStock() ? 'Selected Color Out of Stock' : 'Out of Stock'
+                  selectedVariation && !isSelectedVariationInStock() ? 'Selected Color Out of Stock' : 'Will be availalable soon'
                 ) : (
                   'Add to Cart'
                 )}

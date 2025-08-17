@@ -382,18 +382,19 @@ const OrderDetails = ({ order }) => (
 
     <div>
       <strong>Items:</strong>
-      <ul className="list-disc ml-4 sm:ml-5 mt-1 text-xs sm:text-sm">
-        {(order.items || []).map((item, i) => (
-          <li key={i}>
-            {item.title} – 
-            {item.variation && ` Color: ${item.variation} –`}
-            {item.type && ` Type: ${item.type} –`}
-            {item.size && ` Size: ${item.size} –`}
-            Qty: {item.quantity} – 
-            Price: PKR {item.price?.toLocaleString()}
-          </li>
-        ))}
-      </ul>
+<ul className="list-disc ml-4 sm:ml-5 mt-1 text-xs sm:text-sm">
+  {(order.items || []).map((item, i) => (
+    <li key={i} className="font-semibold">
+      {item.title} – 
+      {item.variation && ` Color: ${item.variation} –`}
+      {item.type && ` Type: ${item.type} –`}
+      {item.size && ` Size: ${item.size} –`}
+      Qty: {item.quantity} – 
+      Price: PKR {item.price?.toLocaleString()}
+    </li>
+  ))}
+</ul>
+
     </div>
   </div>
 );
