@@ -5,7 +5,7 @@ const categories = [
     {
     id: 3,
     title: "Bracelets ˚⊹♡",
-    imageUrl: "https://scontent.flhe3-2.fna.fbcdn.net/v/t1.15752-9/521349181_737084372371080_7694854766131764488_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=106&ccb=1-7&_nc_sid=0024fc&_nc_ohc=Fsv5uGhELl4Q7kNvwG_lAdO&_nc_oc=AdlYcUu20aZCwgodBLHx-MwgDblAqI5nnRiz5bmELqfX8JeL2d0ddTzNf9cA1x1jgv4&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.flhe3-2.fna&oh=03_Q7cD2wHPdHHYuUKWZMnyDNGfJmoIh-195cqknxDBQhvyKSMC3A&oe=68AC0C82",
+    imageUrl: "https://i.postimg.cc/3xDtjrHL/image.png",
     link: "Bracelets"
   },
   {
