@@ -24,7 +24,7 @@ const categories = [
       {
     id: 2,
     title: "keychains ˚⋆𐙚｡",
-    imageUrl: "https://i.postimg.cc/nhvvcXxt/image.png",
+    imageUrl: "https://i.postimg.cc/J0zyNQGb/image.png",
       link: "keychains"
   },
       {
