@@ -374,6 +374,7 @@ const OrderDetails = ({ order }) => (
       <div className="ml-0 sm:ml-4 text-xs sm:text-sm">
         <p>{order.shippingAddress?.fullName}</p>
         <p>{order.shippingAddress?.address}</p>
+        <p>{order.customerEmail}</p>
         <p>{order.shippingAddress?.city}, {order.shippingAddress?.region}</p>
         <p>{order.shippingAddress?.country}, {order.shippingAddress?.postalCode}</p>
         <p>Phone: {order.shippingAddress?.phone}</p>
