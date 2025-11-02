@@ -34,6 +34,9 @@ const CheckoutPage = () => {
   const [errors, setErrors] = useState({});
   const [bankTransferProofBase64, setBankTransferProofBase64] = useState(null);
   const [convertingImage, setConvertingImage] = useState(false);
+  const [discount, setDiscount] = useState(0);
+  const [promoCodeApplied, setPromoCodeApplied] = useState(false);
+  const [promoCodeError, setPromoCodeError] = useState('');
 
   // Load cart items from localStorage or session storage
   useEffect(() => {
@@ -71,7 +74,8 @@ const CheckoutPage = () => {
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shippingCost = 230;
-  const total = subtotal + shippingCost;
+  const discountAmount = discount;
+  const total = subtotal + shippingCost - discountAmount;
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -109,6 +113,33 @@ const CheckoutPage = () => {
     } else {
       setBankTransferProofBase64(null);
     }
+  };
+
+  const applyPromoCode = () => {
+    const promoCode = form.promoCode.trim().toUpperCase();
+    
+    if (!promoCode) {
+      setPromoCodeError('Please enter a promo code');
+      return;
+    }
+
+    if (promoCode === 'VH12') {
+      const discountAmount = subtotal * 0.12; // 12% discount
+      setDiscount(discountAmount);
+      setPromoCodeApplied(true);
+      setPromoCodeError('');
+    } else {
+      setDiscount(0);
+      setPromoCodeApplied(false);
+      setPromoCodeError('Invalid promo code');
+    }
+  };
+
+  const removePromoCode = () => {
+    setForm(prev => ({ ...prev, promoCode: '' }));
+    setDiscount(0);
+    setPromoCodeApplied(false);
+    setPromoCodeError('');
   };
 
   const validateForm = () => {
@@ -176,6 +207,8 @@ const CheckoutPage = () => {
         country: form.country,
       },
       promoCode: form.promoCode,
+      promoCodeApplied: promoCodeApplied,
+      discountAmount: discount,
       notes: form.notes,
       subtotal,
       shippingCost,
@@ -448,10 +481,30 @@ const CheckoutPage = () => {
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:ring-black focus:border-black"
                     placeholder="Enter promo code"
                   />
-                  <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-r-md hover:bg-gray-300 transition">
-                    Apply
-                  </button>
+                  {promoCodeApplied ? (
+                    <button 
+                      onClick={removePromoCode}
+                      className="px-4 py-2 bg-red-600 text-white rounded-r-md hover:bg-red-700 transition"
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={applyPromoCode}
+                      className="px-4 py-2 bg-black text-white rounded-r-md hover:bg-gray-800 transition"
+                    >
+                      Apply
+                    </button>
+                  )}
                 </div>
+                {promoCodeError && (
+                  <p className="mt-1 text-sm text-red-600">{promoCodeError}</p>
+                )}
+                {promoCodeApplied && (
+                  <p className="mt-1 text-sm text-green-600">
+                    Promo code applied! 12% discount ({discount.toLocaleString()} PKR) has been applied to your order.
+                  </p>
+                )}
               </div>
 
               <div className="mt-6">
@@ -524,10 +577,10 @@ const CheckoutPage = () => {
                   <span className="text-sm">PKR {shippingCost.toLocaleString()}</span>
                 </div>
 
-                {form.promoCode && (
+                {promoCodeApplied && (
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Discount</span>
-                    <span className="text-sm text-green-600">-PKR 0</span>
+                    <span className="text-sm text-gray-600">Discount (12%)</span>
+                    <span className="text-sm text-green-600">-PKR {discount.toLocaleString()}</span>
                   </div>
                 )}
               </div>
@@ -559,7 +612,6 @@ const CheckoutPage = () => {
 
               <div className="mt-6 text-center text-xs sm:text-sm text-gray-500">
                 <p>100% secure checkout</p>
-
               </div>
             </div>
           </div>
