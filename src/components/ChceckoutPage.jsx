@@ -73,7 +73,7 @@ const CheckoutPage = () => {
   }, []);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shippingCost = 230;
+  const shippingCost = 250; // Changed from 230 to 250
   const discountAmount = discount;
   const total = subtotal + shippingCost - discountAmount;
 
@@ -407,7 +407,7 @@ const CheckoutPage = () => {
                   <div className="ml-3">
                     <p className="font-medium text-gray-900">Standard Delivery</p>
                     <p className="text-sm text-gray-500">
-                      PKR 230 - Delivery in 4-5 business days
+                      PKR 250 - Delivery in 4-5 business days {/* Changed from 230 to 250 */}
                     </p>
                   </div>
                 </label>
@@ -416,19 +416,18 @@ const CheckoutPage = () => {
               <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
 
               <div className="space-y-4">
-                {['EasyPaisa', 'Cash on Delivery'].map(method => (
-                  <label key={method} className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={method}
-                      checked={form.paymentMethod === method}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-black focus:ring-black border-gray-300"
-                    />
-                    <span className="ml-3 font-medium text-gray-900">{method}</span>
-                  </label>
-                ))}
+                {/* Only EasyPaisa option remains */}
+                <label className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="EasyPaisa"
+                    checked={form.paymentMethod === 'EasyPaisa'}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-black focus:ring-black border-gray-300"
+                  />
+                  <span className="ml-3 font-medium text-gray-900">EasyPaisa</span>
+                </label>
               </div>
 
               {form.paymentMethod === 'EasyPaisa' && (
@@ -574,7 +573,7 @@ const CheckoutPage = () => {
 
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Shipping</span>
-                  <span className="text-sm">PKR {shippingCost.toLocaleString()}</span>
+                  <span className="text-sm">PKR {shippingCost.toLocaleString()}</span> {/* Shows 250 now */}
                 </div>
 
                 {promoCodeApplied && (
