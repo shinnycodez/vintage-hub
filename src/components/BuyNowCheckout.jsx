@@ -50,7 +50,7 @@ const BuyNowCheckout = () => {
   }, []);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-  const shippingCost = 230;
+  const shippingCost = 250; // Changed from 230 to 250
   const discountAmount = discount;
   const total = subtotal + shippingCost - discountAmount;
 
@@ -417,7 +417,7 @@ const BuyNowCheckout = () => {
                   <div className="ml-3">
                     <p className="font-medium text-gray-900 text-sm sm:text-base">Standard Delivery</p>
                     <p className="text-xs sm:text-sm text-gray-500">
-                      PKR 230 - Delivery in 4-5 business days
+                      PKR 250 - Delivery in 4-5 business days {/* Changed from 230 to 250 */}
                     </p>
                   </div>
                 </label>
@@ -426,7 +426,7 @@ const BuyNowCheckout = () => {
               <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
               
               <div className="space-y-4">
-                {/* EasyPaisa Option */}
+                {/* Only EasyPaisa Option */}
                 <label className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
                   <input
                     type="radio"
@@ -437,19 +437,6 @@ const BuyNowCheckout = () => {
                     className="h-4 w-4 text-black focus:ring-black border-gray-300"
                   />
                   <span className="ml-3 font-medium text-gray-900 text-sm sm:text-base">EasyPaisa</span>
-                </label>
-
-                {/* Cash on Delivery (COD) Option */}
-                <label className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="Cash on Delivery"
-                    checked={form.paymentMethod === 'Cash on Delivery'}
-                    onChange={handleChange}
-                    className="h-4 w-4 text-black focus:ring-black border-gray-300"
-                  />
-                  <span className="ml-3 font-medium text-gray-900 text-sm sm:text-base">Cash on Delivery</span>
                 </label>
               </div>
 
@@ -601,7 +588,7 @@ const BuyNowCheckout = () => {
                 
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Shipping</span>
-                  <span className="text-sm">PKR {shippingCost.toLocaleString()}</span>
+                  <span className="text-sm">PKR {shippingCost.toLocaleString()}</span> {/* Shows 250 now */}
                 </div>
                 
                 {promoCodeApplied && (
