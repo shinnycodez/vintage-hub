@@ -128,6 +128,11 @@ const CheckoutPage = () => {
       setDiscount(discountAmount);
       setPromoCodeApplied(true);
       setPromoCodeError('');
+    } else if (promoCode === 'VH15') {
+      const discountAmount = subtotal * 0.15; // 15% discount
+      setDiscount(discountAmount);
+      setPromoCodeApplied(true);
+      setPromoCodeError('');
     } else {
       setDiscount(0);
       setPromoCodeApplied(false);
@@ -501,7 +506,7 @@ const CheckoutPage = () => {
                 )}
                 {promoCodeApplied && (
                   <p className="mt-1 text-sm text-green-600">
-                    Promo code applied! 12% discount ({discount.toLocaleString()} PKR) has been applied to your order.
+                    Promo code applied! {form.promoCode.toUpperCase()} - {form.promoCode.toUpperCase() === 'VH15' ? '15%' : '12%'} discount ({discount.toLocaleString()} PKR) has been applied to your order.
                   </p>
                 )}
               </div>
@@ -578,7 +583,9 @@ const CheckoutPage = () => {
 
                 {promoCodeApplied && (
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Discount (12%)</span>
+                    <span className="text-sm text-gray-600">
+                      Discount ({form.promoCode.toUpperCase() === 'VH15' ? '15%' : '12%'})
+                    </span>
                     <span className="text-sm text-green-600">-PKR {discount.toLocaleString()}</span>
                   </div>
                 )}
