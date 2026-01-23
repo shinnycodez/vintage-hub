@@ -14,7 +14,12 @@ const categories = [
     imageUrl: "https://i.postimg.cc/T3mcLkrF/image.png",
       link: "Phone charms",
   },
-
+        {
+    id: 5,
+    title: "Raw materials ⋆⭒˚.⋆",
+    imageUrl:"https://i.pinimg.com/736x/37/8c/f0/378cf01bcc930716049bb781edd69190.jpg",
+     link: "Raw materials"
+  },
 
   //   {
   //   id: 4,
