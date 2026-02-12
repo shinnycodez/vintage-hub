@@ -73,7 +73,7 @@ const CheckoutPage = () => {
   }, []);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shippingCost = 250; // Changed from 230 to 250
+  const shippingCost = 250;
   const discountAmount = discount;
   const total = subtotal + shippingCost - discountAmount;
 
@@ -86,7 +86,7 @@ const CheckoutPage = () => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
-    // Clear the Base64 string if payment method changes from EasyPaisa
+    // Clear the Base64 string if payment method is not EasyPaisa
     if (name === 'paymentMethod' && value !== 'EasyPaisa') {
       setBankTransferProofBase64(null);
     }
@@ -124,12 +124,12 @@ const CheckoutPage = () => {
     }
 
     if (promoCode === 'VH12') {
-      const discountAmount = subtotal * 0.12; // 12% discount
+      const discountAmount = subtotal * 0.12;
       setDiscount(discountAmount);
       setPromoCodeApplied(true);
       setPromoCodeError('');
     } else if (promoCode === 'VH15') {
-      const discountAmount = subtotal * 0.15; // 15% discount
+      const discountAmount = subtotal * 0.15;
       setDiscount(discountAmount);
       setPromoCodeApplied(true);
       setPromoCodeError('');
@@ -149,7 +149,7 @@ const CheckoutPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    const requiredFields = [ 'fullName', 'phone', 'address', 'city', 'country'];
+    const requiredFields = ['fullName', 'phone', 'address', 'city', 'country'];
     requiredFields.forEach(field => {
       if (!form[field]) {
         newErrors[field] = 'This field is required';
@@ -161,6 +161,7 @@ const CheckoutPage = () => {
       newErrors.email = 'Please enter a valid email address';
     }
 
+    // Only require EasyPaisa proof if EasyPaisa is selected
     if (form.paymentMethod === 'EasyPaisa' && !bankTransferProofBase64) {
       newErrors.bankTransferProof = 'Please upload a screenshot of your EasyPaisa transfer.';
     }
@@ -186,7 +187,7 @@ const CheckoutPage = () => {
 
     const order = {
       orderId,
-      customerType: 'guest', // Mark as guest order
+      customerType: 'guest',
       customerEmail: form.email,
       items: cartItems.map(item => ({
         productId: item.productId || item.id,
@@ -194,7 +195,6 @@ const CheckoutPage = () => {
         quantity: item.quantity,
         price: item.price,
         image: item.image,
-        // Store variation details
         variation: item.variation || null,
         type: item.type || null,
         size: item.size || null,
@@ -219,7 +219,7 @@ const CheckoutPage = () => {
       shippingCost,
       total,
       createdAt: new Date(),
-      status: 'processing',
+      status: form.paymentMethod === 'COD' ? 'confirmed' : 'processing', // COD orders are confirmed immediately
       bankTransferProofBase64: form.paymentMethod === 'EasyPaisa' ? bankTransferProofBase64 : null,
     };
 
@@ -412,7 +412,7 @@ const CheckoutPage = () => {
                   <div className="ml-3">
                     <p className="font-medium text-gray-900">Standard Delivery</p>
                     <p className="text-sm text-gray-500">
-                      PKR 250 - Delivery in 4-5 business days {/* Changed from 230 to 250 */}
+                      PKR 250 - Delivery in 4-5 business days
                     </p>
                   </div>
                 </label>
@@ -421,7 +421,20 @@ const CheckoutPage = () => {
               <h2 className="text-lg sm:text-xl font-semibold mt-8 mb-6 pb-2 border-b">Payment Method</h2>
 
               <div className="space-y-4">
-                {/* Only EasyPaisa option remains */}
+                {/* COD Option */}
+                <label className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="COD"
+                    checked={form.paymentMethod === 'COD'}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-black focus:ring-black border-gray-300"
+                  />
+                  <span className="ml-3 font-medium text-gray-900">Cash on Delivery (COD)</span>
+                </label>
+
+                {/* EasyPaisa Option */}
                 <label className="flex items-center p-4 border rounded-md hover:border-black cursor-pointer">
                   <input
                     type="radio"
@@ -435,6 +448,7 @@ const CheckoutPage = () => {
                 </label>
               </div>
 
+              {/* EasyPaisa Instructions - Only show when EasyPaisa is selected */}
               {form.paymentMethod === 'EasyPaisa' && (
                 <div className="mt-6 p-4 border border-blue-300 bg-blue-50 rounded-md">
                   <h3 className="text-base sm:text-lg font-semibold mb-3">EasyPaisa Transfer Details</h3>
@@ -442,7 +456,7 @@ const CheckoutPage = () => {
                     Please transfer the total amount of PKR {total.toLocaleString()} to our EasyPaisa account:
                   </p>
                   <ul className="list-disc list-inside text-gray-800 text-sm sm:text-base mb-4">
-                     <li><strong>Account Name:</strong> Maham </li>
+                    <li><strong>Account Name:</strong> Maham</li>
                     <li><strong>EasyPaisa Number:</strong> 03105816903</li>
                   </ul>
                   <p className="text-gray-700 text-sm sm:text-base mb-4">
@@ -472,6 +486,20 @@ const CheckoutPage = () => {
                       </p>
                     )}
                   </div>
+                </div>
+              )}
+
+              {/* COD Information - Show when COD is selected */}
+              {form.paymentMethod === 'COD' && (
+                <div className="mt-6 p-4 border border-green-300 bg-green-50 rounded-md">
+                  <h3 className="text-base sm:text-lg font-semibold mb-2">Cash on Delivery (COD)</h3>
+                  <p className="text-gray-700 text-sm sm:text-base">
+                    You will pay PKR {total.toLocaleString()} in cash upon delivery. 
+                    Please ensure you have the exact amount ready when your order arrives.
+                  </p>
+                  <p className="text-gray-600 text-xs sm:text-sm mt-2">
+                    No advance payment required. Your order will be confirmed immediately.
+                  </p>
                 </div>
               )}
 
@@ -578,7 +606,7 @@ const CheckoutPage = () => {
 
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Shipping</span>
-                  <span className="text-sm">PKR {shippingCost.toLocaleString()}</span> {/* Shows 250 now */}
+                  <span className="text-sm">PKR {shippingCost.toLocaleString()}</span>
                 </div>
 
                 {promoCodeApplied && (
@@ -598,8 +626,12 @@ const CheckoutPage = () => {
 
               <button
                 onClick={placeOrder}
-                disabled={loading || cartItems.length === 0 || convertingImage}
-                className={`mt-6 w-full py-3 px-4 rounded-md font-medium text-base ${loading || cartItems.length === 0 || convertingImage ? 'bg-gray-400 cursor-not-allowed' : 'bg-black text-white hover:bg-gray-800'} transition`}
+                disabled={loading || cartItems.length === 0 || convertingImage || (form.paymentMethod === 'EasyPaisa' && !bankTransferProofBase64)}
+                className={`mt-6 w-full py-3 px-4 rounded-md font-medium text-base ${
+                  loading || cartItems.length === 0 || convertingImage || (form.paymentMethod === 'EasyPaisa' && !bankTransferProofBase64) 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-black text-white hover:bg-gray-800'
+                } transition`}
               >
                 {loading || convertingImage ? (
                   <span className="flex items-center justify-center">
@@ -611,6 +643,10 @@ const CheckoutPage = () => {
                   </span>
                 ) : cartItems.length === 0 ? (
                   'Your Cart is Empty'
+                ) : form.paymentMethod === 'COD' ? (
+                  'Place Order (Pay on Delivery)'
+                ) : form.paymentMethod === 'EasyPaisa' && !bankTransferProofBase64 ? (
+                  'Upload Screenshot First'
                 ) : (
                   'Place Order'
                 )}
