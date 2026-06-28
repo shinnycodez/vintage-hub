@@ -37,6 +37,7 @@ const CheckoutPage = () => {
   const [discount, setDiscount] = useState(0);
   const [promoCodeApplied, setPromoCodeApplied] = useState(false);
   const [promoCodeError, setPromoCodeError] = useState('');
+  const [appliedPromoCode, setAppliedPromoCode] = useState('');
 
   // Load cart items from localStorage or session storage
   useEffect(() => {
@@ -72,6 +73,17 @@ const CheckoutPage = () => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  // Define promo codes and their discounts
+  const promoCodes = {
+    'WHITEDAY': 15,
+    'VH15': 15,
+    'WHIPECODE': 15,
+    'VH10': 10,
+    'FABLEFORGE': 18,
+    'VINDAYY': 20,
+    'VH12': 12 // Keeping the existing one for backward compatibility
+  };
+
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shippingCost = 250;
   const discountAmount = discount;
@@ -95,6 +107,14 @@ const CheckoutPage = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Basic file size validation (5MB limit)
+      const MAX_FILE_SIZE = 5 * 1024 * 1024;
+      if (file.size > MAX_FILE_SIZE) {
+        setErrors(prev => ({ ...prev, bankTransferProof: 'File size exceeds 5MB limit.' }));
+        setBankTransferProofBase64(null);
+        return;
+      }
+
       setConvertingImage(true);
       setErrors(prev => ({ ...prev, bankTransferProof: '' }));
 
@@ -123,20 +143,19 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (promoCode === 'VH12') {
-      const discountAmount = subtotal * 0.12;
+    // Check if the promo code exists
+    if (promoCodes[promoCode]) {
+      const discountPercentage = promoCodes[promoCode];
+      const discountAmount = (subtotal * discountPercentage) / 100;
       setDiscount(discountAmount);
       setPromoCodeApplied(true);
       setPromoCodeError('');
-    } else if (promoCode === 'VH15') {
-      const discountAmount = subtotal * 0.15;
-      setDiscount(discountAmount);
-      setPromoCodeApplied(true);
-      setPromoCodeError('');
+      setAppliedPromoCode(promoCode);
     } else {
       setDiscount(0);
       setPromoCodeApplied(false);
       setPromoCodeError('Invalid promo code');
+      setAppliedPromoCode('');
     }
   };
 
@@ -145,6 +164,7 @@ const CheckoutPage = () => {
     setDiscount(0);
     setPromoCodeApplied(false);
     setPromoCodeError('');
+    setAppliedPromoCode('');
   };
 
   const validateForm = () => {
@@ -159,6 +179,11 @@ const CheckoutPage = () => {
     // Email validation
     if (form.email && !/\S+@\S+\.\S+/.test(form.email)) {
       newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Basic phone number validation
+    if (form.phone && !/^\d{7,}$/.test(form.phone.replace(/[\s\-\(\)]/g, ''))) {
+      newErrors.phone = 'Please enter a valid phone number (at least 7 digits)';
     }
 
     // Only require EasyPaisa proof if EasyPaisa is selected
@@ -178,7 +203,18 @@ const CheckoutPage = () => {
   };
 
   const placeOrder = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      // Scroll to the first error field
+      const firstErrorField = Object.keys(errors)[0];
+      if (firstErrorField) {
+        const element = document.getElementsByName(firstErrorField)[0] || 
+                      document.getElementById(firstErrorField);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      return;
+    }
 
     setLoading(true);
 
@@ -213,6 +249,7 @@ const CheckoutPage = () => {
       },
       promoCode: form.promoCode,
       promoCodeApplied: promoCodeApplied,
+      discountPercentage: appliedPromoCode ? promoCodes[appliedPromoCode] : 0,
       discountAmount: discount,
       notes: form.notes,
       subtotal,
@@ -232,14 +269,15 @@ const CheckoutPage = () => {
       // Store order ID for confirmation page
       sessionStorage.setItem('lastOrderId', orderId);
       sessionStorage.setItem('lastOrderEmail', form.email);
+      sessionStorage.setItem('lastOrderType', 'checkout');
 
       navigate('/thanks');
     } catch (err) {
       console.error("Error placing order:", err);
-      if (err.code === 'resource-exhausted' || err.message.includes('too large')) {
+      if (err.code === 'resource-exhausted' || (err.message && err.message.includes('too large'))) {
         alert('Error: The uploaded image is too large. Please try a smaller image or contact support.');
       } else {
-        alert('Error placing order. Please try again.');
+        alert('Error placing order. Please try again. If the issue persists, contact support.');
       }
     } finally {
       setLoading(false);
@@ -304,7 +342,7 @@ const CheckoutPage = () => {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="Enter your email address"
-                  className={`w-full px-4 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
+                  className={`w-full px-4 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                 />
                 {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
               </div>
@@ -318,7 +356,7 @@ const CheckoutPage = () => {
                     name="fullName"
                     value={form.fullName}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
+                    className={`w-full px-4 py-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                   />
                   {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
                 </div>
@@ -329,7 +367,8 @@ const CheckoutPage = () => {
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
+                    placeholder="e.g., 03001234567"
+                    className={`w-full px-4 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                   />
                   {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
                 </div>
@@ -340,7 +379,7 @@ const CheckoutPage = () => {
                     name="address"
                     value={form.address}
                     onChange={handleChange}
-                    className={`w-full px-4 py-2 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
+                    className={`w-full px-4 py-2 border ${errors.address ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                   />
                   {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
                 </div>
@@ -352,7 +391,7 @@ const CheckoutPage = () => {
                       name="city"
                       value={form.city}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border ${errors.city ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
+                      className={`w-full px-4 py-2 border ${errors.city ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                     />
                     {errors.city && <p className="mt-1 text-sm text-red-600">{errors.city}</p>}
                   </div>
@@ -363,7 +402,7 @@ const CheckoutPage = () => {
                       name="postalCode"
                       value={form.postalCode}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border ${errors.postalCode ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
+                      className={`w-full px-4 py-2 border ${errors.postalCode ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                     />
                     {errors.postalCode && <p className="mt-1 text-sm text-red-600">{errors.postalCode}</p>}
                   </div>
@@ -376,7 +415,7 @@ const CheckoutPage = () => {
                       name="region"
                       value={form.region}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border ${errors.region ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
+                      className={`w-full px-4 py-2 border ${errors.region ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                     />
                     {errors.region && <p className="mt-1 text-sm text-red-600">{errors.region}</p>}
                   </div>
@@ -387,7 +426,7 @@ const CheckoutPage = () => {
                       name="country"
                       value={form.country}
                       onChange={handleChange}
-                      className={`w-full px-4 py-2 border ${errors.country ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
+                      className={`w-full px-4 py-2 border ${errors.country ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                     >
                       <option value="">Select Country</option>
                       <option value="PK">Pakistan</option>
@@ -410,7 +449,7 @@ const CheckoutPage = () => {
                     className="h-4 w-4 text-black focus:ring-black border-gray-300"
                   />
                   <div className="ml-3">
-                    <p className="font-medium text-gray-900">Standard Delivery</p>
+                    <p className="font-medium text-gray-900 text-sm sm:text-base">Standard Delivery</p>
                     <p className="text-sm text-gray-500">
                       PKR 250 - Delivery in 4-5 business days
                     </p>
@@ -431,7 +470,7 @@ const CheckoutPage = () => {
                     onChange={handleChange}
                     className="h-4 w-4 text-black focus:ring-black border-gray-300"
                   />
-                  <span className="ml-3 font-medium text-gray-900">Cash on Delivery (COD)</span>
+                  <span className="ml-3 font-medium text-gray-900 text-sm sm:text-base">Cash on Delivery (COD)</span>
                 </label>
 
                 {/* EasyPaisa Option */}
@@ -444,7 +483,7 @@ const CheckoutPage = () => {
                     onChange={handleChange}
                     className="h-4 w-4 text-black focus:ring-black border-gray-300"
                   />
-                  <span className="ml-3 font-medium text-gray-900">EasyPaisa</span>
+                  <span className="ml-3 font-medium text-gray-900 text-sm sm:text-base">EasyPaisa</span>
                 </label>
               </div>
 
@@ -470,7 +509,7 @@ const CheckoutPage = () => {
                       type="file"
                       accept="image/*"
                       onChange={handleFileChange}
-                      className={`w-full px-4 py-2 border ${errors.bankTransferProof ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black`}
+                      className={`w-full px-4 py-2 border ${errors.bankTransferProof ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-black focus:border-black text-sm sm:text-base`}
                     />
                     {errors.bankTransferProof && <p className="mt-1 text-sm text-red-600">{errors.bankTransferProof}</p>}
                     {bankTransferProofBase64 && (
@@ -510,20 +549,20 @@ const CheckoutPage = () => {
                     name="promoCode"
                     value={form.promoCode}
                     onChange={handleChange}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:ring-black focus:border-black"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-l-md focus:ring-black focus:border-black text-sm sm:text-base"
                     placeholder="Enter promo code"
                   />
                   {promoCodeApplied ? (
                     <button 
                       onClick={removePromoCode}
-                      className="px-4 py-2 bg-red-600 text-white rounded-r-md hover:bg-red-700 transition"
+                      className="px-4 py-2 bg-red-600 text-white rounded-r-md hover:bg-red-700 transition text-sm sm:text-base"
                     >
                       Remove
                     </button>
                   ) : (
                     <button 
                       onClick={applyPromoCode}
-                      className="px-4 py-2 bg-black text-white rounded-r-md hover:bg-gray-800 transition"
+                      className="px-4 py-2 bg-black text-white rounded-r-md hover:bg-gray-800 transition text-sm sm:text-base"
                     >
                       Apply
                     </button>
@@ -534,7 +573,7 @@ const CheckoutPage = () => {
                 )}
                 {promoCodeApplied && (
                   <p className="mt-1 text-sm text-green-600">
-                    Promo code applied! {form.promoCode.toUpperCase()} - {form.promoCode.toUpperCase() === 'VH15' ? '15%' : '12%'} discount ({discount.toLocaleString()} PKR) has been applied to your order.
+                    Promo code applied! {appliedPromoCode} - {promoCodes[appliedPromoCode]}% discount ({discount.toLocaleString()} PKR) has been applied to your order.
                   </p>
                 )}
               </div>
@@ -546,7 +585,7 @@ const CheckoutPage = () => {
                   value={form.notes}
                   onChange={handleChange}
                   rows="3"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-black focus:border-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-black focus:border-black text-sm sm:text-base"
                   placeholder="Special instructions, delivery notes, etc."
                 />
               </div>
@@ -566,7 +605,7 @@ const CheckoutPage = () => {
                         className="w-20 h-25 object-top rounded flex-shrink-0"
                       />
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{item.title}</p>
+                        <p className="font-medium text-gray-900 text-sm sm:text-base">{item.title}</p>
                         
                         {/* Display variation (color) if it exists */}
                         {item.variation && (
@@ -591,7 +630,7 @@ const CheckoutPage = () => {
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
                     </div>
-                    <p className="font-medium mt-2 sm:mt-0 sm:ml-4">
+                    <p className="font-medium mt-2 sm:mt-0 sm:ml-4 text-sm sm:text-base">
                       PKR {(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
@@ -612,7 +651,7 @@ const CheckoutPage = () => {
                 {promoCodeApplied && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">
-                      Discount ({form.promoCode.toUpperCase() === 'VH15' ? '15%' : '12%'})
+                      Discount ({appliedPromoCode} - {promoCodes[appliedPromoCode]}%)
                     </span>
                     <span className="text-sm text-green-600">-PKR {discount.toLocaleString()}</span>
                   </div>
