@@ -29,6 +29,7 @@ const BuyNowCheckout = () => {
   const [discount, setDiscount] = useState(0);
   const [promoCodeApplied, setPromoCodeApplied] = useState(false);
   const [promoCodeError, setPromoCodeError] = useState('');
+  const [appliedPromoCode, setAppliedPromoCode] = useState('');
 
   // Load buy now product from session storage
   useEffect(() => {
@@ -48,6 +49,17 @@ const BuyNowCheckout = () => {
       console.error('Error loading buy now product:', error);
     }
   }, []);
+
+  // Define promo codes and their discounts
+  const promoCodes = {
+    'WHITEDAY': 15,
+    'VH15': 15,
+    'WHIPECODE': 15,
+    'VH10': 10,
+    'FABLEFORGE': 18,
+    'VINDAYY': 20,
+    'VH12': 12 // Keeping the existing one for backward compatibility
+  };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
   const shippingCost = 250;
@@ -113,20 +125,19 @@ const BuyNowCheckout = () => {
       return;
     }
 
-    if (promoCode === 'VH12') {
-      const discountAmount = subtotal * 0.12;
+    // Check if the promo code exists
+    if (promoCodes[promoCode]) {
+      const discountPercentage = promoCodes[promoCode];
+      const discountAmount = (subtotal * discountPercentage) / 100;
       setDiscount(discountAmount);
       setPromoCodeApplied(true);
       setPromoCodeError('');
-    } else if (promoCode === 'VH15') {
-      const discountAmount = subtotal * 0.15;
-      setDiscount(discountAmount);
-      setPromoCodeApplied(true);
-      setPromoCodeError('');
+      setAppliedPromoCode(promoCode);
     } else {
       setDiscount(0);
       setPromoCodeApplied(false);
       setPromoCodeError('Invalid promo code');
+      setAppliedPromoCode('');
     }
   };
 
@@ -135,6 +146,7 @@ const BuyNowCheckout = () => {
     setDiscount(0);
     setPromoCodeApplied(false);
     setPromoCodeError('');
+    setAppliedPromoCode('');
   };
 
   const validateForm = () => {
@@ -214,6 +226,7 @@ const BuyNowCheckout = () => {
       },
       promoCode: form.promoCode,
       promoCodeApplied: promoCodeApplied,
+      discountPercentage: appliedPromoCode ? promoCodes[appliedPromoCode] : 0,
       discountAmount: discount,
       notes: form.notes,
       subtotal,
@@ -549,7 +562,7 @@ const BuyNowCheckout = () => {
                 )}
                 {promoCodeApplied && (
                   <p className="mt-1 text-sm text-green-600">
-                    Promo code applied! {form.promoCode.toUpperCase()} - {form.promoCode.toUpperCase() === 'VH15' ? '15%' : '12%'} discount ({discount.toLocaleString()} PKR) has been applied to your order.
+                    Promo code applied! {appliedPromoCode} - {promoCodes[appliedPromoCode]}% discount ({discount.toLocaleString()} PKR) has been applied to your order.
                   </p>
                 )}
               </div>
@@ -628,7 +641,7 @@ const BuyNowCheckout = () => {
                 {promoCodeApplied && (
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">
-                      Discount ({form.promoCode.toUpperCase() === 'VH15' ? '15%' : '12%'})
+                      Discount ({appliedPromoCode} - {promoCodes[appliedPromoCode]}%)
                     </span>
                     <span className="text-sm text-green-600">-PKR {discount.toLocaleString()}</span>
                   </div>
